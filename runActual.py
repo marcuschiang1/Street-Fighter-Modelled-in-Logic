@@ -42,6 +42,8 @@ LK_1 = BasicPropositions("LK_1") #Player 1 performs a light kick
 MK_1 = BasicPropositions("MK_1") #Player 1 performs a medium kick
 HK_1 = BasicPropositions("HK_1") #Player 1 performs a heavy kick
 T_1 = BasicPropositions("T_1") #Player 1 performs a throw
+HADOUKEN_1 = BasicPropositions("HADOUKEN_1") #Player 1 has performed a hadouken
+SHORYU_1 = BasicPropositions("SHORYU_1") #Player 1 has performed a shoryuken
 #Player 1 inputs
 I_LP = BasicPropositions("I_LP")
 I_MP = BasicPropositions("I_MP")
@@ -49,10 +51,19 @@ I_HP = BasicPropositions("I_HP")
 I_LK = BasicPropositions("I_LK")
 I_MK = BasicPropositions("I_MK")
 I_HK = BasicPropositions("I_HK")
+
 #Propostions for player 2 (The NPC)
 W_2 = BasicPropositions("W_2") #Player 2 wins
-A_2 = BasicPropositions("A_2") #Player 2 performs an attack
 D_2 = BasicPropositions("D_2") #Player 2 has been damaged
+LP_2 = BasicPropositions("LP_2") #Player 2 performs a light punch
+MP_2 = BasicPropositions("MP_2") #Player 2 performs a medium punch
+HP_2 = BasicPropositions("HP_2") #Player 2 performs a heavy punch
+LK_2 = BasicPropositions("LK_2") #Player 2 performs a light kick
+MK_2 = BasicPropositions("MK_2") #Player 2 performs a medium kick
+HK_2 = BasicPropositions("HK_2") #Player 2 performs a heavy kick
+T_2 = BasicPropositions("T_2") #Player 2 performs a throw
+HADOUKEN_2 = BasicPropositions("HADOUKEN_2") #Player 2 has performed a hadouken
+SHORYU_2 = BasicPropositions("SHORYU_2") #Player 2 has performed a shoryuken
 
 # At least one of these will be true
 x = FancyPropositions("x")
@@ -66,7 +77,9 @@ z = FancyPropositions("z")
 #  This restriction is fairly minimal, and if there is any concern, reach out to the teaching staff to clarify
 #  what the expectations are.
 def example_theory():
-    # Add custom constraints by creating formulas with the variables you created. 
+    # Add custom constraints by creating formulas with the variables you created.
+    #Throw input
+    E.add_constraint((I_LP_1 | I_LK_1)>>T_1)
     E.add_constraint((LP_1 & MP_1).negate())
     # Implication
     E.add_constraint(y >> z)
