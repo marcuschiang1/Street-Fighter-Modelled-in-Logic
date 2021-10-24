@@ -32,7 +32,7 @@ class FancyPropositions:
         return f"A.{self.data}"
 
 # Call your variables whatever you want
-W_1 = BasicPropositions("W_1") #Player 1 wins
+Player1Wins = BasicPropositions("W_1") #Player 1 wins
 A_1 = BasicPropositions("A_1") #Player 1 performs an attack
 D_1 = BasicPropositions("D_1") #Player 1 has been damaged
 W_2 = BasicPropositions("W_2") #Player 2 wins
