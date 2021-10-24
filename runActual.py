@@ -67,7 +67,7 @@ z = FancyPropositions("z")
 #  what the expectations are.
 def example_theory():
     # Add custom constraints by creating formulas with the variables you created. 
-    E.add_constraint(~(LP_1 & MP_1))
+    E.add_constraint((LP_1 & MP_1).negate())
     # Implication
     E.add_constraint(y >> z)
     # Negate a formula
