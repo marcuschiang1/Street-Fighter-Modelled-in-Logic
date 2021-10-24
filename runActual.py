@@ -45,12 +45,20 @@ T_1 = BasicPropositions("T_1") #Player 1 performs a throw
 HADOUKEN_1 = BasicPropositions("HADOUKEN_1") #Player 1 has performed a hadouken
 SHORYU_1 = BasicPropositions("SHORYU_1") #Player 1 has performed a shoryuken
 #Player 1 inputs
-I_LP = BasicPropositions("I_LP")
-I_MP = BasicPropositions("I_MP")
-I_HP = BasicPropositions("I_HP")
-I_LK = BasicPropositions("I_LK")
-I_MK = BasicPropositions("I_MK")
-I_HK = BasicPropositions("I_HK")
+I_LP = BasicPropositions("I_LP") #Light punch input
+I_MP = BasicPropositions("I_MP") #Medium punch input
+I_HP = BasicPropositions("I_HP") #Heavy punch input
+I_LK = BasicPropositions("I_LK") #Light kick input
+I_MK = BasicPropositions("I_MK") #Medium kick input 
+I_HK = BasicPropositions("I_HK") #Heavy kick input
+I_1 = BasicPropositions("1") #Down back
+I_2 = BasicPropositions("2") #Down
+I_3 = BasicPropositions("3") #Down forward
+I_4 = BasicPropositions("4") #Back
+I_6 = BasicPropositions("6") #Forward
+I_7 = BasicPropositions("7") #Up back
+I_8 = BasicPropositions("8") #Up
+I_9 = BasicPropositions("9") #Up forward
 
 #Propostions for player 2 (The NPC)
 W_2 = BasicPropositions("W_2") #Player 2 wins
