@@ -32,18 +32,28 @@ class FancyPropositions:
         return f"A.{self.data}"
 
 # Call your variables whatever you want
-Player1Wins = BasicPropositions("W_1") #Player 1 wins
-A_1 = BasicPropositions("A_1") #Player 1 performs an attack
+#Propositions for player 1 
+W_1 = BasicPropositions("W_1") #Player 1 wins
 D_1 = BasicPropositions("D_1") #Player 1 has been damaged
-W_2 = BasicPropositions("W_2") #Player 2 wins
-A_2 = BasicPropositions("A_2") #Player 2 performs an attack
-D_2 = BasicPropositions("D_2") #Player 2 has been damaged
+LP_1 = BasicPropositions("LP_1") #Player 1 performs a light punch
+MP_1 = BasicPropositions("MP_1") #Player 1 performs a medium punch
+HP_1 = BasicPropositions("HP_1") #Player 1 performs a heavy punch
+LK_1 = BasicPropositions("LK_1") #Player 1 performs a light kick
+MK_1 = BasicPropositions("MK_1") #Player 1 performs a medium kick
+HK_1 = BasicPropositions("HK_1") #Player 1 performs a heavy kick
+T_1 = BasicPropositions("T_1") #Player 1 performs a throw
+#Player 1 inputs
 I_LP = BasicPropositions("I_LP")
 I_MP = BasicPropositions("I_MP")
 I_HP = BasicPropositions("I_HP")
 I_LK = BasicPropositions("I_LK")
 I_MK = BasicPropositions("I_MK")
 I_HK = BasicPropositions("I_HK")
+#Propostions for player 2 (The NPC)
+W_2 = BasicPropositions("W_2") #Player 2 wins
+A_2 = BasicPropositions("A_2") #Player 2 performs an attack
+D_2 = BasicPropositions("D_2") #Player 2 has been damaged
+
 # At least one of these will be true
 x = FancyPropositions("x")
 y = FancyPropositions("y")
