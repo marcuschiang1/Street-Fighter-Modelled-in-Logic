@@ -44,6 +44,10 @@ HK_1 = BasicPropositions("HK_1") #Player 1 performs a heavy kick
 T_1 = BasicPropositions("T_1") #Player 1 performs a throw
 HADOUKEN_1 = BasicPropositions("HADOUKEN_1") #Player 1 has performed a hadouken
 SHORYU_1 = BasicPropositions("SHORYU_1") #Player 1 has performed a shoryuken
+SPACE1_1 = BasicPropositions("SPACE1_1") #Player 1 in space 1
+SPACE2_1 = BasicPropositions("SPACE2_1") #Player 1 in space 2
+SPACE3_1 = BasicPropositions("SPACE3_1") #Player 1 in space 3
+WHIFF_1 = BasicPropositions("WHIFF_1") #Player 1 whiffed their attack
 #Player 1 inputs
 I_LP = BasicPropositions("I_LP") #Light punch input
 I_MP = BasicPropositions("I_MP") #Medium punch input
@@ -72,6 +76,10 @@ HK_2 = BasicPropositions("HK_2") #Player 2 performs a heavy kick
 T_2 = BasicPropositions("T_2") #Player 2 performs a throw
 HADOUKEN_2 = BasicPropositions("HADOUKEN_2") #Player 2 has performed a hadouken
 SHORYU_2 = BasicPropositions("SHORYU_2") #Player 2 has performed a shoryuken
+SPACE1_2 = BasicPropositions("SPACE1_2") #Player 2 in space 1
+SPACE2_2 = BasicPropositions("SPACE2_2") #Player 2 in space 2
+SPACE3_2 = BasicPropositions("SPACE3_2") #Player 2 in space 3
+WHIFF_2 = BasicPropositions("WHIFF_2") #Player 2 whiffed their attack
 
 # At least one of these will be true
 x = FancyPropositions("x")
