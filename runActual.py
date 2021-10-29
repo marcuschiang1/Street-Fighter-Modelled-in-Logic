@@ -131,6 +131,7 @@ def example_theory():
     E.add_constraint(H_2&JUMP_1)#The converse is also true
     E.add_constraint(((T_1&T_2)&(adjacent))>>bothNeutral)#Throw break
     E.add_constraint(((B_1)&(T_2))&adjacent)#Throwing a blocking opponent works
+    #Constraints
     E.add_constraint((P_2&~adjacent)>>WHIFF_2)#Player 2 whiffs if other player is not adjacent
     E.add_constraint(((P_2|K_2|H_2|SHORYU_2)&(B_1))>>~D_1)#If player 1 is blocking and player 2 attacks then player 1 is not damaged
 
