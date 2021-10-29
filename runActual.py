@@ -55,12 +55,8 @@ SHORYU_1 = BProp("SHORYU_1") #Player 1 has performed a shoryuken (Beats MP)
 NEUTRAL_1 = BProp("NEUTRAL_1")#Player 1 is in a neutral positions
 WHIFF_1 = BasicPropositions("WHIFF_1") #Player 1 whiffed their attack
 #Player 1 inputs
-I_LP = BasicPropositions("I_LP") #Light punch input
-I_MP = BasicPropositions("I_MP") #Medium punch input
-I_HP = BasicPropositions("I_HP") #Heavy punch input
-I_LK = BasicPropositions("I_LK") #Light kick input
-I_MK = BasicPropositions("I_MK") #Medium kick input 
-I_HK = BasicPropositions("I_HK") #Heavy kick input
+I_P = BProp("I_P_1")
+I_K = BProp("I_K_1")
 
 #using dictionary for variables
 #using for loop to create dictionary
@@ -120,18 +116,21 @@ z = FancyPropositions("z")
 #  what the expectations are.
 def example_theory():
     # Add custom constraints by creating formulas with the variables you created.
-    #Throw input
-    E.add_constraint((I_LP_1 | I_LK_1)>>T_1)
-    E.add_constraint((LP_1 & MP_1).negate())
     # Implication
     E.add_constraint((W_1 & W_2).negate()) #added constraints
     # Negate a formula
     E.add_constraint((D_1 & B_1).negate() | (D_2 & B_2).negate)
-    
-    
     # You can also add more customized "fancy" constraints. Use case: you don't want to enforce "exactly one"
     # for every instance of BasicPropositions, but you want to enforce it for a, b, and c.:
     constraint.add_exactly_one(E, a, b, c)
+    #The rules
+    E.add_constraint((I_P & I_K)>>T_1) #Punch and kick from a player results in a throw
+    E.add_constraint((P_1&K_1).negate())
+    E.add_constraint((P_2&K_2).negate())#Player 1 nor 2 may perform a kick and punch at the same time
+    E.add_constraint(H_1&JUMP_2)#Player 2 may jump to not get hit by a player 1 H
+    E.add_constraint(H_2&JUMP_1)#The converse is also true
+    E.add_constraint(((T_1&T_2)&(adjacent))>>bothNeutral)
+    E.add_constraint((B_1)&(T_2))
 
     return E
 
