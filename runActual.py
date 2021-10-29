@@ -39,7 +39,7 @@ d = {}
 
 for i in range(1,10):
 
-    d["I_{0}".format(i)] = BasicPropositions("i")
+    d["I_{0}".format(i)] = BasicPropositions()
     
     
 W_1 = BasicPropositions("W_1") #Player 1 wins
@@ -68,11 +68,11 @@ I_HK = BasicPropositions("I_HK") #Heavy kick input
 
 #using dictionary for variables
 #using for loop to create dictionary
-d = {}
+
 
 for i in range(1,10):
 
-    d["I_{0}".format(i)] = BasicPropositions("i")
+    d["I_{0}".format(i)] = BasicPropositions(Str(i))
     
     
 
@@ -122,9 +122,11 @@ def example_theory():
     E.add_constraint((I_LP_1 | I_LK_1)>>T_1)
     E.add_constraint((LP_1 & MP_1).negate())
     # Implication
-    E.add_constraint(y >> z)
+    E.add_constraint((W_1 & W_2).negate()) #added constraints
     # Negate a formula
-    E.add_constraint((x & y).negate())
+    E.add_constraint((D_1 & B_1).negate() | (D_2 & B_2).negate)
+    
+    
     # You can also add more customized "fancy" constraints. Use case: you don't want to enforce "exactly one"
     # for every instance of BasicPropositions, but you want to enforce it for a, b, and c.:
     constraint.add_exactly_one(E, a, b, c)
