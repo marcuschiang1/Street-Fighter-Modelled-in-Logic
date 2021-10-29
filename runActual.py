@@ -32,7 +32,16 @@ class FancyPropositions:
         return f"A.{self.data}"
 
 # Call your variables whatever you want
-#Propositions for player 1 
+#Propositions for player 1
+
+
+d = {}
+
+for i in range(1,10):
+
+    d["I_{0}".format(i)] = BasicPropositions("i")
+    
+    
 W_1 = BasicPropositions("W_1") #Player 1 wins
 D_1 = BasicPropositions("D_1") #Player 1 has been damaged
 LP_1 = BasicPropositions("LP_1") #Player 1 performs a light punch
@@ -55,6 +64,21 @@ I_HP = BasicPropositions("I_HP") #Heavy punch input
 I_LK = BasicPropositions("I_LK") #Light kick input
 I_MK = BasicPropositions("I_MK") #Medium kick input 
 I_HK = BasicPropositions("I_HK") #Heavy kick input
+
+
+#using dictionary for variables
+#using for loop to create dictionary
+d = {}
+
+for i in range(1,10):
+
+    d["I_{0}".format(i)] = BasicPropositions("i")
+    
+    
+
+
+
+
 I_1 = BasicPropositions("1") #Down back
 I_2 = BasicPropositions("2") #Down
 I_3 = BasicPropositions("3") #Down forward
