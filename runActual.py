@@ -35,11 +35,7 @@ class FancyPropositions:
 #Propositions for player 1
 
 
-d = {}
 
-for i in range(1,10):
-
-    d["I_{0}".format(i)] = BasicPropositions()
     
     
 W_1 = BasicPropositions("W_1") #Player 1 wins
@@ -124,7 +120,7 @@ def example_theory():
     # Implication
     E.add_constraint((W_1 & W_2).negate()) #added constraints
     # Negate a formula
-    E.add_constraint((D_1 & B_1).negate() | (D_2 & B_2).negate)
+    E.add_constraint((D_1 & B_1).negate() | (D_2 & B_2).negate.())
     
     
     # You can also add more customized "fancy" constraints. Use case: you don't want to enforce "exactly one"
