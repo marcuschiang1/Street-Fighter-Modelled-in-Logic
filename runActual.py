@@ -66,21 +66,8 @@ for i in range(1,10):
 
     d["I_{0}".format(i)] = BasicPropositions(Str(i))
     
-    
 
-
-
-
-I_1 = BasicPropositions("1") #Down back
-I_2 = BasicPropositions("2") #Down
-I_3 = BasicPropositions("3") #Down forward
-I_4 = BasicPropositions("4") #Back
-I_6 = BasicPropositions("6") #Forward
-I_7 = BasicPropositions("7") #Up back
-I_8 = BasicPropositions("8") #Up
-I_9 = BasicPropositions("9") #Up forward
-
-#Propostions for player 2 (The NPC)
+#Propositions for player 2 (The NPC)
 W_2 = BProp("W_2") #Player 2 wins
 D_2 = BProp("D_2") #Player 2 has been damaged
 P_2 = BProp("P_2") #Player 2 performs a punch
