@@ -35,23 +35,24 @@ class FancyPropositions:
 #Propositions for player 1
 
 
+d = {}
 
+for i in range(1,10):
+
+    d["I_{0}".format(i)] = BasicPropositions()
     
     
-W_1 = BasicPropositions("W_1") #Player 1 wins
-D_1 = BasicPropositions("D_1") #Player 1 has been damaged
-LP_1 = BasicPropositions("LP_1") #Player 1 performs a light punch
-MP_1 = BasicPropositions("MP_1") #Player 1 performs a medium punch
-HP_1 = BasicPropositions("HP_1") #Player 1 performs a heavy punch
-LK_1 = BasicPropositions("LK_1") #Player 1 performs a light kick
-MK_1 = BasicPropositions("MK_1") #Player 1 performs a medium kick
-HK_1 = BasicPropositions("HK_1") #Player 1 performs a heavy kick
-T_1 = BasicPropositions("T_1") #Player 1 performs a throw
-HADOUKEN_1 = BasicPropositions("HADOUKEN_1") #Player 1 has performed a hadouken
-SHORYU_1 = BasicPropositions("SHORYU_1") #Player 1 has performed a shoryuken
-SPACE1_1 = BasicPropositions("SPACE1_1") #Player 1 in space 1
-SPACE2_1 = BasicPropositions("SPACE2_1") #Player 1 in space 2
-SPACE3_1 = BasicPropositions("SPACE3_1") #Player 1 in space 3
+#Propositions for player 1 
+W_1 = BProp("W_1") #Player 1 wins
+D_1 = BProp("D_1") #Player 1 has been damaged
+P_1 = BProp("P_1") #Player 1 performs a punch (range of 1 space)
+K_1 = BProp("K_1") #Player 1 performs a kick (range of 2 spaces)
+T_1 = BProp("T_1") #Player 1 performs a throw
+B_1 = BProp("B_1") #Player 1 is blocking
+JUMP_1 = BProp("JUMP_1") #Player 1 jumps
+H_1 = BProp("H_1") #Player 1 has performed a H (range of 3 spaces)
+SHORYU_1 = BProp("SHORYU_1") #Player 1 has performed a shoryuken (Beats MP)
+NEUTRAL_1 = BProp("NEUTRAL_1")#Player 1 is in a neutral positions
 WHIFF_1 = BasicPropositions("WHIFF_1") #Player 1 whiffed their attack
 #Player 1 inputs
 I_LP = BasicPropositions("I_LP") #Light punch input
@@ -60,7 +61,6 @@ I_HP = BasicPropositions("I_HP") #Heavy punch input
 I_LK = BasicPropositions("I_LK") #Light kick input
 I_MK = BasicPropositions("I_MK") #Medium kick input 
 I_HK = BasicPropositions("I_HK") #Heavy kick input
-
 
 #using dictionary for variables
 #using for loop to create dictionary
@@ -85,21 +85,27 @@ I_8 = BasicPropositions("8") #Up
 I_9 = BasicPropositions("9") #Up forward
 
 #Propostions for player 2 (The NPC)
-W_2 = BasicPropositions("W_2") #Player 2 wins
-D_2 = BasicPropositions("D_2") #Player 2 has been damaged
-LP_2 = BasicPropositions("LP_2") #Player 2 performs a light punch
-MP_2 = BasicPropositions("MP_2") #Player 2 performs a medium punch
-HP_2 = BasicPropositions("HP_2") #Player 2 performs a heavy punch
-LK_2 = BasicPropositions("LK_2") #Player 2 performs a light kick
-MK_2 = BasicPropositions("MK_2") #Player 2 performs a medium kick
-HK_2 = BasicPropositions("HK_2") #Player 2 performs a heavy kick
-T_2 = BasicPropositions("T_2") #Player 2 performs a throw
-HADOUKEN_2 = BasicPropositions("HADOUKEN_2") #Player 2 has performed a hadouken
-SHORYU_2 = BasicPropositions("SHORYU_2") #Player 2 has performed a shoryuken
-SPACE1_2 = BasicPropositions("SPACE1_2") #Player 2 in space 1
-SPACE2_2 = BasicPropositions("SPACE2_2") #Player 2 in space 2
-SPACE3_2 = BasicPropositions("SPACE3_2") #Player 2 in space 3
+W_2 = BProp("W_2") #Player 2 wins
+D_2 = BProp("D_2") #Player 2 has been damaged
+P_2 = BProp("P_2") #Player 2 performs a punch
+K_2 = BProp("K_2") #Player 2 performs a kick
+T_2 = BProp("T_2") #Player 2 performs a throw
+B_2 = BProp("B_2") #Player 2 is blocking
+JUMP_2 = BProp("JUMP_2") #Player 2 jumps
+H_2 = BProp("H_2") #Player 2 has performed a H
+SHORYU_2 = BProp("SHORYU_2") #Player 2 has performed a shoryuken
+NEUTRAL_2 = BProp("NEUTRAL_2")#Player 2 is in a neutral positions
 WHIFF_2 = BasicPropositions("WHIFF_2") #Player 2 whiffed their attack
+
+#Propositions pertaining to both players
+fourSpacesBetween = ((P1position[0]&P2position[5])|(P1position[5]&P2position[0]))#In the first and last spots, also converse
+threeSpacesBetween = ((P1position[0]&P2position[4])|(P1position[4]&P2position[0])|(P1position[1]&P2position[5])|(P1position[5]&P2position[1]))
+twoSpacesBetween = ((P1position[0]&P2position[3])|(P1position[3]&P2position[0])|(P1position[1]&P2position[4])|(P1position[4]&P2position[1])|(P1position[2]&P2position[5])|(P1position[5]&P2position[2]))
+oneSpaceBetweem = ((P1position[0]&P2position[2])|(P1position[2]&P2position[0])|(P1position[1]&P2position[3])|(P1position[3]&P2position[1])|(P1position[2]&P2position[4])|(P1position[4]&P2position[2])|(P1position[3]&P2position[5])|(P1position[5]&P2position[3]))
+#Adjacent would be 0 spaces away, right next to eachother
+adjacent = ((P1position[0]&P2position[1])|(P1position[1]&P2position[2])|(P1position[2]&P2position[3])|(P1position[3]&P2position[4])|(P1position[4]&P2position[5])|(P1position[1]&P2position[0])|(P1position[2]&P2position[1])|(P1position[3]&P2position[2])|(P1position[4]&P2position[3])|(P1position[5]&P2position[4]))
+bothNeutral = (NEUTRAL_1&NEUTRAL_2)
+#Player 2 has no inputs since they are NPC, so no input propositions
 
 # At least one of these will be true
 x = FancyPropositions("x")
@@ -120,7 +126,7 @@ def example_theory():
     # Implication
     E.add_constraint((W_1 & W_2).negate()) #added constraints
     # Negate a formula
-    E.add_constraint((D_1 & B_1).negate() | (D_2 & B_2).negate.())
+    E.add_constraint((D_1 & B_1).negate() | (D_2 & B_2).negate)
     
     
     # You can also add more customized "fancy" constraints. Use case: you don't want to enforce "exactly one"
