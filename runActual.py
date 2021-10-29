@@ -130,8 +130,8 @@ def example_theory():
     E.add_constraint(H_1&JUMP_2)#Player 2 may jump to not get hit by a player 1 H
     E.add_constraint(H_2&JUMP_1)#The converse is also true
     E.add_constraint(((T_1&T_2)&(adjacent))>>bothNeutral)#Throw break
-    E.add_constraint(((B_1)&(T_2))&adjacent) #Throwing a blocking opponent works
-
+    E.add_constraint(((B_1)&(T_2))&adjacent)#Throwing a blocking opponent works
+    E.add_constraint((P_2&~adjacent)>>WHIFF_2)#Player 2 whiffs if other player is not adjacent
 
     return E
 
