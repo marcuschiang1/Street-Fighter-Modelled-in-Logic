@@ -137,6 +137,8 @@ def example_theory():
     E.add_constraint(((twoSpacesBetween|threeSpacesBetween|fourSpacesBetween)&K_1)>>(WHIFF_1))#If player 1 uses kick and they are within 2,3,4 spaces of player 2 then player 1 whiffs
     E.add_constraint(((H_1)&(fourSpacesBetween))>>(WHIFF_1)#Attack H does not work when player is there is four spaces between players
     E.add_constraint(((T_1)&(~adjacent))>>(WHIFF_1))#If player 1 throws and player 2 is not adjacent then player 1 whiffs
+    E.add_constraint((S_1))                    
+                    
     return E
 
 
