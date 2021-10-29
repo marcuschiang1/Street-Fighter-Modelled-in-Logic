@@ -132,9 +132,11 @@ def example_theory():
     E.add_constraint(((T_1&T_2)&(adjacent))>>bothNeutral)#Throw break
     E.add_constraint(((B_1)&(T_2))&adjacent)#Throwing a blocking opponent works
     #Constraints
-    E.add_constraint((P_2&~adjacent)>>WHIFF_2)#Player 2 whiffs if other player is not adjacent
+    E.add_constraint((P&~adjacent)>>WHIFF_2)#Punch does not work if opposing player is not adjacent
     E.add_constraint(((P|K|H|SHORYU)&(B))>>bothNeutral)#If player 1 or 2 is blocking and the other player does an attack then nothing happens
-
+    E.add_constraint(((twoSpacesBetween|threeSpacesBetween|fourSpacesBetween)&K)>>(bothNeutral))#If player 1 or 2 uses kick and they are within 2,3,4 spaces then kick does nothing
+    E.add_constraint(((H)&(fourSpacesBetween))>>(bothNeutral)#Attack H does not work when player is there is four spaces between players
+    
     return E
 
 
