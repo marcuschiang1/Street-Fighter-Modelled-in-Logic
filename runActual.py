@@ -118,8 +118,8 @@ def example_theory():
     # Add custom constraints by creating formulas with the variables you created.
     # Implication
     E.add_constraint((W_1 & W_2).negate()) #Both players can't win
-    # Negate a formula
     E.add_constraint((D_1 & B_1).negate() | (D_2 & B_2).negate) #Player 1 can't block and get hit at the same time
+    # Negate a formula
     # You can also add more customized "fancy" constraints. Use case: you don't want to enforce "exactly one"
     # for every instance of BasicPropositions, but you want to enforce it for a, b, and c.:
     constraint.add_exactly_one(E, a, b, c)
