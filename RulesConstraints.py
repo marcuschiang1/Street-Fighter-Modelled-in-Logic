@@ -5,7 +5,10 @@ from PlayerProps import*
 
 # Encoding that will store all of your constraints
 E = Encoding()
-
+p1Propositions()
+p2Propositions()
+bothPlayerProposition()
+playerPositions()
 # To create propositions, create classes for them first, annotated with "@proposition" and the Encoding
 @proposition(E)
 class BProp:
@@ -16,8 +19,6 @@ class BProp:
     def __repr__(self):
         return f"A.{self.data}"
 def constraints():
-    E.add_constraint(~(P_1&K_1))
-    E.add_constraint(~(P_2&K_2))#Player 1 nor 2 may perform a kick and punch at the same time
     E.add_constraint(H_1&JUMP_2)#Player 2 may jump to not get hit by a player 1 H
     E.add_constraint(H_2&JUMP_1)#The converse is also true
     E.add_constraint(((T_1&T_2)&(adjacent))>>bothNeutral)#Throw break

@@ -5,7 +5,7 @@ from bauhaus.utils import count_solutions, likelihood
 E = Encoding()
 
 # To create propositions, create classes for them first, annotated with "@proposition" and the Encoding
-@constraint._add_exactly_one(E)
+@constraint.exactly_one(E)
 @proposition(E)
 class p1Position:
 
@@ -14,7 +14,7 @@ class p1Position:
 
     def __repr__(self):
         return f"A.{self.data}"
-@constraint._add_exactly_one(E)
+@constraint.exactly_one(E)
 @proposition(E)
 class p2Position:
 
