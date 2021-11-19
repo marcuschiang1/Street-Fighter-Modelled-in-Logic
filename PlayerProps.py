@@ -7,8 +7,8 @@ from RulesConstraints import*
 E = Encoding()
 
 # To create propositions, create classes for them first, annotated with "@proposition" and the Encoding
+@constraint.add_exactly_one(E)
 @proposition(E)
-@at_most_one(E)
 class p1Action:
 
     def __init__(self, data):
@@ -36,8 +36,9 @@ def p1Propositions():
     SHORYU_1 = p1Action("SHORYU_1") #Player 1 has performed a shoryuken (Beats MP)
     NEUTRAL_1 = p1State("NEUTRAL_1")#Player 1 is in a neutral positions
     WHIFF_1 = p1State("WHIFF_1") #Player 1 whiffed their attack
+
+@constraint.add_exactly_one(E)
 @proposition(E)
-@at_most_one(E)
 class p2Action:
 
     def __init__(self, data):
