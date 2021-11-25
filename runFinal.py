@@ -2,28 +2,23 @@
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
 # For a complete module reference, see https://bauhaus.readthedocs.io/en/latest/bauhaus.html
-
 # Encoding that will store all of your constraints
 E = Encoding()
 ############################################# Players
-@constraint.add_exactly_one(E)
+@constraint.at_most_one(E)
 @proposition(E)
 class p1Action:
-
     def __init__(self, data):
         self.data = data
-
     def __repr__(self):
         return f"A.{self.data}"
+@constraint.at_most_one
 @proposition(E)
 class p1State:
-
     def __init__(self, data):
         self.data = data
-
     def __repr__(self):
         return f"A.{self.data}"
-
 W_1 = p1Action("W_1") #Player 1 wins
 D_1 = p1Action("D_1") #Player 1 has been damaged
 P_1 = p1Action("P_1") #Player 1 performs a punch (range of 1 space)
@@ -33,24 +28,22 @@ B_1 = p1Action("B_1") #Player 1 is blocking
 JUMP_1 = p1Action("JUMP_1") #Player 1 jumps
 H_1 = p1Action("H_1") #Player 1 has performed a H (range of 3 spaces)
 SHORYU_1 = p1Action("SHORYU_1") #Player 1 has performed a shoryuken (Beats MP)
+#
 NEUTRAL_1 = p1State("NEUTRAL_1")#Player 1 is in a neutral positions
 WHIFF_1 = p1State("WHIFF_1") #Player 1 whiffed their attack
 
-@constraint.add_exactly_one(E)
+@constraint.at_most_one(E)
 @proposition(E)
 class p2Action:
-
     def __init__(self, data):
         self.data = data
-
     def __repr__(self):
         return f"A.{self.data}"
+@constraint.at_most_one
 @proposition(E)
 class p2State:
-
     def __init__(self, data):
         self.data = data
-
     def __repr__(self):
         return f"A.{self.data}"
 
@@ -64,29 +57,25 @@ B_2 = p2Action("B_2") #Player 2 is blocking
 JUMP_2 = p2Action("JUMP_2") #Player 2 jumps
 H_2 = p2Action("H_2") #Player 2 has performed a H
 SHORYU_2 = p2Action("SHORYU_2") #Player 2 has performed a shoryuken
+#
 NEUTRAL_2 = p2State("NEUTRAL_2")#Player 2 is in a neutral positions
 WHIFF_2 = p2State("WHIFF_2") #Player 2 whiffed their attack
-
 #Both
 bothNeutral = (NEUTRAL_1&NEUTRAL_2)
 ############################################# Stage
 @constraint.exactly_one(E)
 @proposition(E)
 class p1Position:
-
     def __init__(self, data):
         self.data = data
-
     def __repr__(self):
         return f"A.{self.data}"
 
 @constraint.exactly_one(E)
 @proposition(E)
 class p2Position:
-
     def __init__(self, data):
         self.data = data
-
     def __repr__(self):
         return f"A.{self.data}"
 
@@ -107,17 +96,17 @@ adjacent = ((P1position[0]&P2position[1])|(P1position[1]&P2position[2])|(P1posit
 #############################################
 
 def game():
+    #Defence options
     E.add_constraint(H_1&JUMP_2)#Player 2 may jump to not get hit by a player 1 H
     E.add_constraint(H_2&JUMP_1)#The converse is also true
+    #Throws
     E.add_constraint(((T_1&T_2)&(adjacent))>>bothNeutral)#Throw break
     E.add_constraint(((B_1)&(T_2))&adjacent)#Throwing a blocking opponent works
+    E.add_constraint(((B_1)&(T_2))&adjacent)#Throwing a blocking opponent works
+    #Attack Ranges
     E.add_constraint((P_1&~adjacent)>>(WHIFF_1))#If player 1 punches and player 2 is not adjacent then nothing happens
     E.add_constraint((P_2&~adjacent)>>(WHIFF_2))
-    E.add_constraint(((P_1|K_1|H_1|SHORYU_1)&B_2)>>bothNeutral)#If player 2 is blocking and player 1 does an attack then nothing happens
-    E.add_constraint(((P_2|K_2|H_2|SHORYU_1)&B_1)>>bothNeutral)
-    E.add_constraint(((twoSpacesBetween|threeSpacesBetween|fourSpacesBetween)&K_1)>>WHIFF_1)#If player 1 or 2 uses kick and they are within 2,3,4 spaces then kick does nothing
-    E.add_constraint((H_1)&(fourSpacesBetween)>>WHIFF_1)#Attack H does not work when player is there is four spaces between players
-    E.add_constraint((H_2&fourSpacesBetween)>>WHIFF_2)
+    #Compiling and returning theory
     T = E.compile
     return T
 
