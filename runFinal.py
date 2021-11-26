@@ -12,7 +12,7 @@ class p1Action:
         self.data = data
     def __repr__(self):
         return f"A.{self.data}"
-@constraint.at_most_one
+@constraint.at_most_one(E)
 @proposition(E)
 class p1State:
     def __init__(self, data):
@@ -39,7 +39,7 @@ class p2Action:
         self.data = data
     def __repr__(self):
         return f"A.{self.data}"
-@constraint.at_most_one
+@constraint.at_most_one(E)
 @proposition(E)
 class p2State:
     def __init__(self, data):
@@ -107,8 +107,7 @@ def game():
     E.add_constraint((P_1&~adjacent)>>(WHIFF_1))#If player 1 punches and player 2 is not adjacent then nothing happens
     E.add_constraint((P_2&~adjacent)>>(WHIFF_2))
     #Compiling and returning theory
-    T = E.compile
-    return T
+    return E
 
 if __name__ == "__main__":
 
