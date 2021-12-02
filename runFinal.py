@@ -103,7 +103,6 @@ def defence():
     #Player 1 limitations
     for subset in combination(p1ActionArray,2):
         E.add_constraint(~(subset[0]&subset[1]))
-    E.add_constraint(~K_1)#Kick will not serve as a defensive option
     #P1 Range
     E.add_constraint(~(P_1&~adjacent))#Player 1 may not punch when not adjacent
     E.add_constraint(~(K_1&~(adjacent|oneSpaceBetween)))#Player 1 may not kick if not within one space
@@ -115,20 +114,20 @@ def defence():
     E.add_constraint(~(K_2&~(adjacent|oneSpaceBetween)))#Player 2 may not kick if not within one space
     E.add_constraint(~(H_2&~(adjacent|oneSpaceBetween|twoSpacesBetween)))#Player 2 may not hadouken if not within two spaces
     E.add_constraint(~(T_2&~adjacent))#Player 2 may not throw if not adjacent
+    E.add_constraint(~(SHORYU_2&~adjacent))
     #From here on, range is covered. Do not need to include range in constraints since they already may not happen when not in range.
     #Punches
     E.add_constraint(~(P_2&~(B_1|JUMP_1|SHORYU_1)))#Player one must block, jump, or dp a punch
+    E.add_constraint(~(P_2&K_2))
     #Kicks
     E.add_constraint(~(K_2&~(B_1|JUMP_1|SHORYU_1)))#Player one may block, jump, or dp a kick.
     #Throws 
     E.add_constraint(~(T_2&~(T_1|P_1)))#Player 1 must throw back if thrown
     E.add_constraint(~(T_2&SHORYU_1))#Player 1 may not dp a throw
     #Fireballs
-    E.add_constraint(~(H_2&~(JUMP_1|B_1|H_1)))#Player 1 just jump, block, or fire their own hadouken
+    E.add_constraint(~(H_2&~(JUMP_1|B_1|H_1|SHORYU_1|K_1|P_1)))#Player 1 just jump, block, fire their own hadouken, or stuff theirs
     #Shoryukens
     E.add_constraint(~(SHORYU_2&~(T_1|B_1)))
-    
-
     
     #Compiling and returning theory
     return E
@@ -146,6 +145,4 @@ if __name__ == "__main__":
     print("\nLikelihood for player 1 to perform a certain action:")
     for v,vn in zip(p1ActionArray, 'PKTHS'):
         print(" %s: %.2f" % (vn, likelihood(T, v)))
-    #print("\nVariable likelihoods for player 2:")
-    #for v,vn in zip(p2ActionArray, 'abcxyz'):
-        #print(" %s: %.2f" % (vn, likelihood(T, v)))
+    
