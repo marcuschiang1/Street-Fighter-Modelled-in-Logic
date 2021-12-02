@@ -4,11 +4,16 @@ from bauhaus.core import print_theory
 from bauhaus.utils import count_solutions, likelihood
 from tabulate import tabulate
 import pprint
+import itertools
+def combination(arr,r):
+    return list(itertools.combinations(arr,r))
+
 # For a complete module reference, see https://bauhaus.readthedocs.io/en/latest/bauhaus.html
 # Encoding that will store all of your constraints
 E = Encoding()
 ############################################# Players
 @proposition(E)
+
 class p1Action:
     def __init__(self, data):
         self.data = data
@@ -28,7 +33,7 @@ B_1 = p1Action("B") #Player 1 is blocking
 JUMP_1 = p1Action("JUMP") #Player 1 jumps (beats hadouken)
 H_1 = p1Action("H") #Player 1 has performed a H (2 spaces between)
 SHORYU_1 = p1Action("SHORYU") #Player 1 has performed a shoryuken (Beats MP)
-p1AttackArray = [P_1,K_1,H_1]
+p1ActionArray = [P_1,K_1,H_1,T_1,JUMP_1,B_1]
 #
 WHIFF_1 = p1State("WHIFF") #Player 1 whiffed their attack
 D_1 = p1State("D") #Player 1 has been damaged
@@ -96,28 +101,34 @@ adjacent = ((P1position[0]&P2position[1])|(P1position[1]&P2position[2])|(P1posit
 
 def defence():
     #Player 1 limitations
-    for i in range(len(p1AttackArray)-1):
-        E.add_constraint(~p1AttackArray[i])#We are in defence, so set p1 attacks to be false
-    E.add_constraint(~(B_1&JUMP_1))#You can not block while jumping
-    E.add_constraint(~(JUMP_1&SHORYU_1))#Can not jump and dp
-    E.add_constraint(~(B_1&SHORYU_1))#Can not block and dp
+    for subset in combination(p1ActionArray,2):
+        E.add_constraint(~(subset[0]&subset[1]))
+    E.add_constraint(~K_1)#Kick will not serve as a defensive option
+    #P1 Range
+    E.add_constraint(~(P_1&~adjacent))#Player 1 may not punch when not adjacent
+    E.add_constraint(~(K_1&~(adjacent|oneSpaceBetween)))#Player 1 may not kick if not within one space
+    E.add_constraint(~(H_1&~(adjacent|oneSpaceBetween|twoSpacesBetween)))#Player 1 may not hadouken if not within two spaces
+    E.add_constraint(~(T_1&~adjacent))#Player 1 may not throw if not adjacent
+    E.add_constraint(~(SHORYU_1&~adjacent))
     #P2 Range
     E.add_constraint(~(P_2&~adjacent))#Player 2 may not punch when not adjacent
     E.add_constraint(~(K_2&~(adjacent|oneSpaceBetween)))#Player 2 may not kick if not within one space
     E.add_constraint(~(H_2&~(adjacent|oneSpaceBetween|twoSpacesBetween)))#Player 2 may not hadouken if not within two spaces
-    E.add_constraint(~(T_2&~adjacent))
-    E.add_constraint(~(SHORYU_2&~adjacent))
+    E.add_constraint(~(T_2&~adjacent))#Player 2 may not throw if not adjacent
+    #From here on, range is covered. Do not need to include range in constraints since they already may not happen when not in range.
     #Punches
-    E.add_constraint(~(P_2&~(B_1|JUMP_1|SHORYU_1)))#Player one must block or jump punches
-    E.add_constraint(~(P_2&~(B_1&JUMP_1|SHORYU_1)))#Player one must block or jump punches
+    E.add_constraint(~(P_2&~(B_1|JUMP_1|SHORYU_1)))#Player one must block, jump, or dp a punch
     #Kicks
-    E.add_constraint(~(K_2&~(B_1|JUMP_1|SHORYU_1)))#Player one must block or jump punches
-    E.add_constraint(~(K_2&~(B_1&JUMP_1|SHORYU_1)))#Player one must block or jump punches
+    E.add_constraint(~(K_2&~(B_1|JUMP_1|SHORYU_1)))#Player one may block, jump, or dp a kick.
     #Throws 
-    E.add_constraint(~(adjacent&T_2&~T_1))#Player 1 must throw back if thrown
+    E.add_constraint(~(T_2&~(T_1|P_1)))#Player 1 must throw back if thrown
     E.add_constraint(~(T_2&SHORYU_1))#Player 1 may not dp a throw
     #Fireballs
+    E.add_constraint(~(H_2&~(JUMP_1|B_1|H_1)))#Player 1 just jump, block, or fire their own hadouken
     #Shoryukens
+    E.add_constraint(~(SHORYU_2&~(T_1|B_1)))
+    
+
     
     #Compiling and returning theory
     return E
@@ -129,12 +140,12 @@ if __name__ == "__main__":
     # After compilation (and only after), you can check some of the properties
     # of your model:
     pprint.pprint("\nSatisfiable: %s" % T.satisfiable())
-    #print("# Solutions: %d" % count_solutions(T))
+    print("# Solutions: %d" % count_solutions(T))
     pprint.pprint("   Solution: %s" % T.solve())
 
-    #print("\nVariable likelihoods for player 1:")
-    #for v,vn in zip(p1ActionArray, 'abcxyz'):
-        #print(" %s: %.2f" % (vn, likelihood(T, v)))
+    print("\nLikelihood for player 1 to perform a certain action:")
+    for v,vn in zip(p1ActionArray, 'PKTHS'):
+        print(" %s: %.2f" % (vn, likelihood(T, v)))
     #print("\nVariable likelihoods for player 2:")
     #for v,vn in zip(p2ActionArray, 'abcxyz'):
         #print(" %s: %.2f" % (vn, likelihood(T, v)))
