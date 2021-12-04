@@ -26,7 +26,7 @@ class p1State:
         self.data = data
     def __repr__(self):
         return f"p1.{self.data}"
-W_1 = p1Action("W") #Player 1 wins
+
 P_1 = p1Action("P") #Player 1 performs a punch (adjacent)
 K_1 = p1Action("K") #Player 1 performs a kick (one space between)
 T_1 = p1Action("T") #Player 1 performs a throw (adjacent)
@@ -53,7 +53,7 @@ class p2State:
         return f"p2.{self.data}"
 
 #Propositions for player 2 
-W_2 = p2Action("W") #Player 2 wins
+
 P_2 = p2Action("P") #Player 2 performs a punch
 K_2 = p2Action("K") #Player 2 performs a kick
 T_2 = p2Action("T") #Player 2 performs a throw
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     # of your model:
     pprint.pprint("\nSatisfiable: %s" % D.satisfiable())
     print("# Solutions: %d" % count_solutions(D))
-    pprint.pprint("   Solution: %s" % D.solve())
+    pprint.pprint("   Solution: %s" % D.solve(), width = 2)
 
     print("\nLikelihood for player 1 to perform a certain action:")
     for v,vn in zip(p1ActionArray, 'PKTHSB'):
