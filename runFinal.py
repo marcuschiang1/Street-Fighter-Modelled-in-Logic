@@ -11,6 +11,7 @@ def combination(arr,r):
 # For a complete module reference, see https://bauhaus.readthedocs.io/en/latest/bauhaus.html
 # Encoding that will store all of your constraints
 E = Encoding()
+C = Encoding()
 ############################################# Players
 @proposition(E)
 
@@ -60,7 +61,7 @@ B_2 = p2Action("B") #Player 2 is blocking
 JUMP_2 = p2Action("JUMP") #Player 2 jumps
 H_2 = p2Action("H") #Player 2 has performed a H
 SHORYU_2 = p2Action("SHORYU") #Player 2 has performed a shoryuken
-p2AttackArray = [P_2,K_2,T_2,H_2,SHORYU_2]
+p2AttackArray = [P_2,K_2,T_2,H_2,SHORYU_2,B_1]
 #
 WHIFF_2 = p2State("WHIFF") #Player 2 whiffed their attack
 D_2 = p2State("D") #Player 2 has been damaged
@@ -133,16 +134,16 @@ def defence():
     return E
 
 if __name__ == "__main__":
-    T = defence()
+    D = defence()
     # Don't compile until you're finished adding all your constraints!
-    T = T.compile()
+    D = D.compile()
     # After compilation (and only after), you can check some of the properties
     # of your model:
-    pprint.pprint("\nSatisfiable: %s" % T.satisfiable())
-    print("# Solutions: %d" % count_solutions(T))
-    pprint.pprint("   Solution: %s" % T.solve())
+    pprint.pprint("\nSatisfiable: %s" % D.satisfiable())
+    print("# Solutions: %d" % count_solutions(D))
+    pprint.pprint("   Solution: %s" % D.solve())
 
     print("\nLikelihood for player 1 to perform a certain action:")
-    for v,vn in zip(p1ActionArray, 'PKTHS'):
-        print(" %s: %.2f" % (vn, likelihood(T, v)))
+    for v,vn in zip(p1ActionArray, 'PKTHSB'):
+        print(" %s: %.2f" % (vn, likelihood(D, v)))
     
