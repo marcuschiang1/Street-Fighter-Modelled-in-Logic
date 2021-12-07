@@ -41,14 +41,14 @@ class p2Attack:
         self.data = data
         self.range = range
     def __repr__(self):
-        return f"p1.{self.data}"
+        return f"p2.{self.data}"
 @proposition(E)
 class p2Action:
     def __init__(self, data):
         self.data = data
 
     def __repr__(self):
-        return f"p1position.{self.data}"
+        return f"p2position.{self.data}"
 
 #Propositions for player 2 
 P_2 = p2Attack("Punch",1) #Player 2 performs a punch
@@ -81,7 +81,8 @@ class p2Position:
 
 p1PositionArray = [p1Position(1),p1Position(2),p1Position(3),p1Position(4),p1Position(5),p1Position(6)]
 p2PositionArray = [p2Position(1),p2Position(2),p2Position(3),p2Position(4),p2Position(5),p2Position(6)]
-
+for i in range(len(p1PositionArray)-1):#Both players may not be in the same position
+    E.add_constraint(~(p1PositionArray[i]&p2PositionArray[i]))
 #Propositions pertaining to both players
 p1AttackArray = [P_1,K_1,T_1,H_1,SHORYU_1]
 p1ActionArray = [B_1,FJUMP_1,NJUMP_1]
@@ -96,17 +97,16 @@ def rangeConstraint(action,p1position,p2position):
 #############################################
 
 def flawlessDefence():
-    #Player 2 limitations
     E.add_constraint(~B_2)
     #Player 1 limitations
-    for subset in combination(p1ActionArray,2):
+    for subset in combination(p1ActionArray,2):#Cannot perform any 2 actions at once
         E.add_constraint(~(subset[0]&subset[1]))
-    for subset in combination(p1AttackArray,2):
+    for subset in combination(p1AttackArray,2):#Cannot perform any 2 attacks at once
         E.add_constraint(~(subset[0]&subset[1]))
-    for i in range(len(p1AttackArray)-1):
+    for i in range(len(p1AttackArray)-1):#Cannot perform and attack and block at the same time
         E.add_constraint(~(p1AttackArray[i]&B_1))
-    for i in range(1,len(p1ActionArray)-1):
-        E.add_constraint(~(B_1&p1ActionArray[i]))
+    for i in range(1,len(p1ActionArray)-1):#Cannot perform either jump and block at the same time
+        E.add_constraint(~(B_1&p1AttackArray[i]))
     #P1 Range
     for p1position in p1PositionArray:
         for p2position in p2PositionArray:
