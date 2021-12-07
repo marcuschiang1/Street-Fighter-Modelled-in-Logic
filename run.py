@@ -90,6 +90,7 @@ p2AttackArray = [P_2,K_2,T_2,H_2,SHORYU_2]
 p2ActionArray = [B_2,FJUMP_2,NJUMP_2]
 eitherJump1 = (FJUMP_1|NJUMP_1)
 eitherJump2 = (FJUMP_2|NJUMP_2)
+
 def rangeConstraint(action,p1position,p2position):
     if (abs(p1position.position-p2position.position)>action.range):
         E.add_constraint(~(p1position&p2position&action))
@@ -107,6 +108,15 @@ def flawlessDefence():
         E.add_constraint(~(p1AttackArray[i]&B_1))
     for i in range(1,len(p1ActionArray)-1):#Cannot perform either jump and block at the same time
         E.add_constraint(~(B_1&p1AttackArray[i]))
+    #Player 2 limitations
+    for subset in combination(p2ActionArray,2):#Cannot perform any 2 actions at once
+        E.add_constraint(~(subset[0]&subset[1]))
+    for subset in combination(p2AttackArray,2):#Cannot perform any 2 attacks at once
+        E.add_constraint(~(subset[0]&subset[1]))
+    for i in range(len(p2AttackArray)-1):#Cannot perform and attack and block at the same time
+        E.add_constraint(~(p2AttackArray[i]&B_1))
+    for i in range(1,len(p2ActionArray)-1):#Cannot perform either jump and block at the same time
+        E.add_constraint(~(B_1&p2AttackArray[i]))
     #P1 Range
     for p1position in p1PositionArray:
         for p2position in p2PositionArray:
@@ -119,18 +129,7 @@ def flawlessDefence():
                 rangeConstraint(attack,p2position,p1position)
 
     #From here on, range is covered. Do not need to include range in constraints since they already may not happen when not in range.
-    #Punches
-    E.add_constraint(~(P_2&~(B_1|eitherJump1|SHORYU_1)))#Player one must block, jump, or dp a punch
-    E.add_constraint(~(P_2&K_1))
-    #Kicks
-    E.add_constraint(~(K_2&~(B_1|eitherJump1|SHORYU_1|(P_1))))#Player one may block, jump, or dp a kick.
-    #Throws 
-    E.add_constraint(~(T_2&~(T_1|P_1)))#Player 1 must throw back if thrown
-    E.add_constraint(~(T_2&SHORYU_1))#Player 1 may not dp a throw
-    #Fireballs
-    E.add_constraint(~(H_2&~(eitherJump1|B_1|(H_1)|SHORYU_1|K_1|P_1)))#Player 1 just jump, block, fire their own hadouken, or stuff theirs
-    #Shoryukens
-    E.add_constraint(~(SHORYU_2&~(T_1|B_1)))
+    
     
     #Compiling and returning theory
     return E
@@ -147,11 +146,11 @@ if __name__ == "__main__":
     print("# Solutions: %d" % count_solutions(D))
     pprint.pprint("Solution:")
     pprint.pprint(D.solve())
-    #print("\nLikelihood for player 1 to perform a certain action:")
+    print("\nLikelihood for player 1 to perform a certain action:")
     p1ActionArray = [P_1,K_1,H_1,SHORYU_1,T_1,NJUMP_1,FJUMP_1,B_1]
     #p2ActionArray = [P_2,K_2,H_1,SHORYU_1,T_1,NJUMP_2,FJUMP_2,B_2]
-    #for v,vn in zip(p1ActionArray, 'PKHSTNFB'):
-        #print(" %s: %.2f" % (vn, likelihood(D, v)))
+    for v,vn in zip(p1ActionArray, 'PKHSTNFB'):
+        print(" %s: %.2f" % (vn, likelihood(D, v)))
     print(len(D.vars()))
     print(len(D))
     
