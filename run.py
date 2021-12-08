@@ -166,7 +166,7 @@ if __name__ == "__main__":
     pprint.pprint("Solution:")
     pprint.pprint(D.solve())
     print("\nLikelihood for player 1 to perform a certain action:")
-    p1ActionArray = [P_1,K_1,H_1,SHORYU_1,T_1,NJUMP_1,FJUMP_1,B_1]
+    
     #p2ActionArray = [P_2,K_2,H_1,SHORYU_1,T_1,NJUMP_2,FJUMP_2,B_2]
     for v,vn in zip(p1ActionArray, 'PKHSTNFBC'):
         print(" %s: %.2f" % (vn, likelihood(D, v)))
