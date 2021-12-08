@@ -96,18 +96,54 @@ class counter:
     def __init__(self,data):
         self.data = data
     def __repr__(self):
-        return f"counter.{self.data}"
+        return f"{self.data}"
+C = counter("COUNTER")
 def rangeConstraint(action,p1position,p2position):
     if (abs(p1position.position-p2position.position)>action.range):
         E.add_constraint(~(p1position&p2position&action))
-def counterHit(p1action, p2action):
-    if (p1action.range>p2action.range):
-        C = counter("Counter")
+def counterHit(counterhitter, counterhitee):#Takes attacks from 2 players a checks if counter hit, if not, adds contraint
+    if (counterhitter.range<counterhitee.range):
+        E.add_constraint(~C)
         
 
 
 #############################################
+def normalGame():
+    for p1position,p2position in zip(p1PositionArray,p2PositionArray):#Both players may not be in the same position
+        E.add_constraint(~(p1position&p2position))
+    E.add_constraint(~B_2)
+    for subset in combination(p1ActionArray,2):#Cannot perform any 2 actions at once
+        E.add_constraint(~(subset[0]&subset[1]))
+    for subset in combination(p1AttackArray,2):#Cannot perform any 2 attacks at once
+        E.add_constraint(~(subset[0]&subset[1]))
+    for i in range(len(p1AttackArray)-1):#Cannot perform and attack and block at the same time
+        E.add_constraint(~(p1AttackArray[i]&B_1))
+    for i in range(1,len(p1ActionArray)-1):#Cannot perform either jump and block at the same time
+        E.add_constraint(~(B_1&p1AttackArray[i]))
+    for i in range(2,len(p1AttackArray)-1):#Cannot perform attacks that are not punch or kick and jump at the same time
+        E.add_constraint(~(NJUMP_1&p1AttackArray[i]))
+        E.add_constraint(~(FJUMP_1&p1AttackArray[i]))
+    #Player 2 limitations
+    for subset in combination(p2ActionArray,2):#Cannot perform any 2 actions at once
+        E.add_constraint(~(subset[0]&subset[1]))
+    for subset in combination(p2AttackArray,2):#Cannot perform any 2 attacks at once
+        E.add_constraint(~(subset[0]&subset[1]))
+    for i in range(len(p2AttackArray)-1):#Cannot perform and attack and block at the same time
+        E.add_constraint(~(p2AttackArray[i]&B_1))
+    for i in range(1,len(p2ActionArray)-1):#Cannot perform either jump and block at the same time
+        E.add_constraint(~(B_1&p2AttackArray[i]))
+    for i in range(2,len(p2AttackArray)-1):
+        E.add_constraint(~(NJUMP_2&p2AttackArray[i]))
+        E.add_constraint(~(FJUMP_2&p2AttackArray[i]))
+    
 def flawlessDefence():
+    E.add_constraint(~K_2)
+    E.add_constraint(~FJUMP_2)
+    E.add_constraint(~NJUMP_2)
+    E.add_constraint(~H_2)
+    E.add_constraint(~P_1)
+    E.add_constraint(~FJUMP_1)
+    E.add_constraint(~NJUMP_1)
     for p1position,p2position in zip(p1PositionArray,p2PositionArray):#Both players may not be in the same position
         E.add_constraint(~(p1position&p2position))
     E.add_constraint(~B_2)
@@ -144,7 +180,13 @@ def flawlessDefence():
         for p1position in p1PositionArray:
             for attack in p2AttackArray:
                 rangeConstraint(attack,p2position,p1position)
-    
+    #Counterhit
+    for p1attack in p1AttackArray:
+        for p2attack in p2AttackArray:
+            counterHit(p1attack,p2attack)
+    for p2attack in p1AttackArray:
+        for p1attack in p2AttackArray:
+            counterHit(p2attack,p1attack)
     return E
 
 if __name__ == "__main__":
