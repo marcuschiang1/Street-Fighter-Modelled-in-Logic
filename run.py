@@ -32,7 +32,9 @@ K_1 = p1Attack("Kick",2) #Player 1 performs a kick (one space between)
 T_1 = p1Attack("Throw",0) #Player 1 performs a throw (adjacent)
 H_1 = p1Attack("Hadouken",3) #Player 1 has performed a H (2 spaces between)
 SHORYU_1 = p1Attack("Shoryuken",0) #Player 1 has performed a shoryuken (Beats MP)
-B_1 = p1Action("Block") #Player 1 is blocking 
+MB_1 = p1Action("MidBlock") #Player 1 is blocking mid
+HB_1 = p1Action("HighBlock") #PLayer1 is blocking high
+LB_1 = p1Action("LowBlock") #Player1 is blocking Low
 NJUMP_1 = p1Action("Neutral Jump") #Player 1 jumps (mostly defensive)
 FJUMP_1 = p1Action("Forward Jump") #Player 1 jumps (mostly offensive)
 #
@@ -58,7 +60,9 @@ K_2 = p2Attack("Kick",2) #Player 2 performs a kick
 T_2 = p2Attack("Throw",0) #Player 2 performs a throw
 H_2 = p2Attack("Hadouken",3) #Player 2 has performed a H
 SHORYU_2 = p2Attack("Shoryuken",0) #Player 2 has performed a shoryuken
-B_2 = p2Action("Block") #Player 2 is blocking
+HB_2 = p2Action("HighBlock") #Player 2 is blocking high
+MB_2 = p2Action("MidBlock") #Player 2 is blocking mid
+LB_2 = p2Action("LowBlock") #Player 2 is blocking Low
 NJUMP_2 = p2Action("Neutral Jump") #Player 2 jumps (mostly defensive)
 FJUMP_2 = p2Action("Forward Jump") #Player 2 jumps (mostly offensive)
 
@@ -85,9 +89,9 @@ p2PositionArray = [p2Position(1),p2Position(2),p2Position(3),p2Position(4),p2Pos
 
 #Propositions pertaining to both players
 p1AttackArray = [P_1,K_1,T_1,H_1,SHORYU_1]
-p1ActionArray = [B_1,FJUMP_1,NJUMP_1]
+p1ActionArray = [LB_1,HB_1,MB_1,FJUMP_1,NJUMP_1]
 p2AttackArray = [P_2,K_2,T_2,H_2,SHORYU_2]
-p2ActionArray = [B_2,FJUMP_2,NJUMP_2]
+p2ActionArray = [HB_2,MB_2,LB_2,FJUMP_2,NJUMP_2]
 eitherJump1 = (FJUMP_1|NJUMP_1)
 eitherJump2 = (FJUMP_2|NJUMP_2)
 
@@ -146,15 +150,17 @@ def flawlessDefence():
     E.add_constraint(~NJUMP_1)
     for p1position,p2position in zip(p1PositionArray,p2PositionArray):#Both players may not be in the same position
         E.add_constraint(~(p1position&p2position))
-    E.add_constraint(~B_2)
+    E.add_constraint(~HB_2)
+    E.add_constraint(~LB_2)
+    E.add_constraint(~MB_2)
     for subset in combination(p1ActionArray,2):#Cannot perform any 2 actions at once
         E.add_constraint(~(subset[0]&subset[1]))
     for subset in combination(p1AttackArray,2):#Cannot perform any 2 attacks at once
         E.add_constraint(~(subset[0]&subset[1]))
     for i in range(len(p1AttackArray)-1):#Cannot perform and attack and block at the same time
-        E.add_constraint(~(p1AttackArray[i]&B_1))
+        E.add_constraint(~(p1AttackArray[i]& MB_1 & LB_1 & HB_1))
     for i in range(1,len(p1ActionArray)-1):#Cannot perform either jump and block at the same time
-        E.add_constraint(~(B_1&p1AttackArray[i]))
+        E.add_constraint(~(HB_1&LB_1&MB_1&p1AttackArray[i]))
     for i in range(2,len(p1AttackArray)-1):#Cannot perform attacks that are not punch or kick and jump at the same time
         E.add_constraint(~(NJUMP_1&p1AttackArray[i]))
         E.add_constraint(~(FJUMP_1&p1AttackArray[i]))
@@ -164,9 +170,9 @@ def flawlessDefence():
     for subset in combination(p2AttackArray,2):#Cannot perform any 2 attacks at once
         E.add_constraint(~(subset[0]&subset[1]))
     for i in range(len(p2AttackArray)-1):#Cannot perform and attack and block at the same time
-        E.add_constraint(~(p2AttackArray[i]&B_1))
+        E.add_constraint(~(p2AttackArray[i]&MB_1&LB_1&HB_1))
     for i in range(1,len(p2ActionArray)-1):#Cannot perform either jump and block at the same time
-        E.add_constraint(~(B_1&p2AttackArray[i]))
+        E.add_constraint(~(HB_1&LB_1&MB_1&p2AttackArray[i]))
     for i in range(2,len(p2AttackArray)-1):
         E.add_constraint(~(NJUMP_2&p2AttackArray[i]))
         E.add_constraint(~(FJUMP_2&p2AttackArray[i]))
@@ -202,7 +208,7 @@ if __name__ == "__main__":
     pprint.pprint("Solution:")
     pprint.pprint(D.solve())
     print("\nLikelihood for player 1 to perform a certain action:")
-    p1ActionArray = [P_1,K_1,H_1,SHORYU_1,T_1,NJUMP_1,FJUMP_1,B_1]
+    
     #p2ActionArray = [P_2,K_2,H_1,SHORYU_1,T_1,NJUMP_2,FJUMP_2,B_2]
     for v,vn in zip(p1ActionArray, 'PKHSTNFBC'):
         print(" %s: %.2f" % (vn, likelihood(D, v)))
