@@ -47,8 +47,8 @@ H_1 = p1Attack("Hadouken",7,14,"mid") #Player 1 has performed a H (2 spaces betw
 SHORYU_1 = p1Attack("Shoryuken",1,0,"mid") #Player 1 has performed a shoryuken (Beats MP)
 HB_1 = p1Action("HighBlock") #PLayer1 is blocking high
 LB_1 = p1Action("LowBlock") #Player1 is blocking Low
-NJUMP_1 = p1Action("Neutral Jump") #Player 1 jumps (mostly defensive)
-FJUMP_1 = p1Action("Forward Jump") #Player 1 jumps (mostly offensive)
+NJUMP_1 = p1Action("Neutral Jump") #Player 1 jumps
+FJUMP_1 = p1Action("Forward Jump") #Player 1 jumps
 MB_1 = (LB_1|HB_1)
 
 #
@@ -119,7 +119,9 @@ p2PositionArray = [p2Position(1),p2Position(2),p2Position(3),p2Position(4),p2Pos
 
 #Propositions pertaining to both players
 
-
+def counterHitConstraint(p1position,p1attack,p2position,p2attack):
+    if ((p2attack.range>abs(p1position.position-p2position.position)) or (p1attack.startUp>p2attack.startUp)):
+        E.add_constraint(~(p1position&p1attack&p2position&p2attack))
 def rangeConstraint(action,p1position,p2position):
     if (abs(p1position.position-p2position.position)>action.range):
         E.add_constraint(~(p1position&p2position&action))
@@ -127,12 +129,6 @@ def counterHitCheck(p1position,p1attack,p2position,p2attack):
     if(abs(p1position.position-p2position.position)<p2attack.range):
         if(p1attack.startUp<p2attack.startUp):
             return True
-
-
-
-        
-
-
 #############################################
 p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchKick_1,T_1,H_1,SHORYU_1]
 p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
@@ -141,19 +137,13 @@ p2ActionArray = [HB_2,LB_2,FJUMP_2,NJUMP_1]
 eitherJump1 = (FJUMP_1|NJUMP_1)
 eitherJump2 = (FJUMP_2|NJUMP_2)
 def flawlessDefence():
-    for attack in p1AttackArray:
-        E.add_constraint(~attack)
-    E.add_constraint(~FJUMP_1)
-    E.add_constraint(~NJUMP_1)
     for p1position,p2position in zip(p1PositionArray,p2PositionArray):#Both players may not be in the same position
         E.add_constraint(~(p1position&p2position))
-    E.add_constraint(~HB_2)
-    E.add_constraint(~LB_2)
     for subset in combination(p1ActionArray,2):#Cannot perform any 2 actions at once
         E.add_constraint(~(subset[0]&subset[1]))
     for subset in combination(p1AttackArray,2):#Cannot perform any 2 attacks at once
         E.add_constraint(~(subset[0]&subset[1]))
-    for i in range(len(p1AttackArray)-1):#Cannot perform and attack and block at the same time
+    for i in range(len(p1AttackArray)-1):#Cannot perform an attack and block at the same time
         E.add_constraint(~(p1AttackArray[i]& MB_1))
     for i in range(1,len(p1ActionArray)-1):#Cannot perform either jump and block at the same time
         E.add_constraint(~(MB_1&p1AttackArray[i]))
@@ -169,7 +159,7 @@ def flawlessDefence():
         E.add_constraint(~(p2AttackArray[i]&MB_1))
     for i in range(1,len(p2ActionArray)-1):#Cannot perform either jump and block at the same time
         E.add_constraint(~(MB_1&p2AttackArray[i]))
-    for i in range(2,len(p2AttackArray)-1):
+    for i in range(2,len(p2AttackArray)-1):#Cannot do either jump and certain attacks
         E.add_constraint(~(NJUMP_2&p2AttackArray[i]))
         E.add_constraint(~(FJUMP_2&p2AttackArray[i]))
     #P1 Range
@@ -182,17 +172,34 @@ def flawlessDefence():
         for p1position in p1PositionArray:
             for attack in p2AttackArray:
                 rangeConstraint(attack,p2position,p1position)
+    #Counterhit
+    for p1position in p1PositionArray:
+        for p2position in p2PositionArray:
+            for p1attack in p1AttackArray:
+                for p2attack in p2AttackArray:
+                    counterHitConstraint(p1position,p1attack,p2position,p2attack)
+                    
     #Rules:
     #High/Low
     for attack in p2AttackArray:
         if (attack.blockType == "overhead"):
-            E.add_constraint(~(attack&~(HB_1)))
+            E.add_constraint(~(attack&LB_1))
         if (attack.blockType == "mid"):
             E.add_constraint(~(attack&~(MB_1)))
         if (attack.blockType == "low"):
-            E.add_constraint(~(attack&~(LB_1)))
+            E.add_constraint(~(attack&HB_1))
         if (attack.blockType == "unblockable"):
             E.add_constraint(~attack&~(T_1|eitherJump1))
+    #Jumping
+    E.add_constraint(~FJUMP_2&~(SHORYU_1|HB_1))
+    
+    #Kicks
+
+    #Throws
+
+    #Hadoken
+
+    #Shoryuken
     return E
 
 if __name__ == "__main__":
@@ -209,7 +216,7 @@ if __name__ == "__main__":
     pprint.pprint(D.solve())
     print("\nLikelihood for player 1 to perform a certain action:")
     p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchKick_1,T_1,H_1,SHORYU_1]
-    p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
+    p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1,C_1]
     p1CombinedArray = p1AttackArray+p1ActionArray
     head = ["Player1 attack",  "Player1 position","Player2 attack", "Player2 position"]
     variable = []*4
@@ -231,7 +238,7 @@ if __name__ == "__main__":
     alist = [0]*6
     for key,element in zip(variable,alist):
         element = key.data
-    for v,vn in zip(p1CombinedArray, 'pPkKTHSBbFN'):
+    for v,vn in zip(p1CombinedArray, 'pPkKTHSBbFNC'):
         print(" %s: %.2f" % (vn, likelihood(D, v)))
     print(len(D.vars()))
     print(len(D))
