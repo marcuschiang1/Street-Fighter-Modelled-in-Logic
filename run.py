@@ -29,14 +29,15 @@ class p1Action:
     def __repr__(self):
         return f"p1.{self.data}"
 @proposition(E)
-class p1Counter:
+class p1Interaction:
     def __init__(self, data):
         self.data = data
         self.type = "p1Counter"
     def __repr__(self):
         return f"p1.{self.data}"
-C_1 = p1Counter("COUNTER")
-Trade_1 = p1Counter("TRADE")
+C_1 = p1Interaction("COUNTER")
+Trade_1 = p1Interaction("TRADE")
+throwBreak_1 = p1Interaction("THROW BREAK")
 lightP_1 = p1Attack("Light Punch",1,3,"mid") #Player 1 performs a punch (adjacent)
 overheadP_1 = p1Attack("Overhead punch",2,22,"overhead")
 crouchK_1 = p1Attack("Crouching Kick",3,6,"low")
@@ -123,6 +124,7 @@ def combination(arr,r):
 def trade(tradeVar,p1position,p1attack,p2position,p2attack):
     if ((p1attack.startUp!=p2attack.startUp)):
         E.add_constraint(~(Trade_1&(p1position&p1attack&p2position&p2attack)))
+
 #THEORIES
 p1AttackArray = [lightP_1,standK_1,overheadP_1,crouchK_1,T_1,H_1,SHORYU_1]
 p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
