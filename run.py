@@ -121,12 +121,12 @@ def rangeConstraint(action,p1position,p2position):
         E.add_constraint(~(p1position&p2position&action))
 def combination(arr,r):
     return list(itertools.combinations(arr,r))
-def trade(tradeVar,p1position,p1attack,p2position,p2attack):
-    if ((p1attack.startUp!=p2attack.startUp) and (p1attack.blockType != "unblockable" and p2attack.blockType != "unblockable")):
-        E.add_constraint(~(tradeVar&(p1position&p1attack&p2position&p2attack)))
+def trade(tradeVar,p1attack,p2attack):
+    if ((p1attack.startUp!=p2attack.startUp)):
+        E.add_constraint(~(tradeVar&(p1attack&p2attack)))
 def throwBreak(breakVar,p1attack,p2attack):
     if ((p1attack.blockType != "unblockable" and p2attack.blockType != "unblockable")):
-        E.add_constraint(~(breakVar&(p1attack&p2attack)))
+        E.add_constraint(~(breakVar&p1attack&p2attack))
 #THEORIES
 p1AttackArray = [lightP_1,standK_1,overheadP_1,crouchK_1,T_1,H_1,SHORYU_1]
 p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
@@ -178,7 +178,7 @@ def defence():
         for p2position in p2PositionArray:
             for p1attack in p1AttackArray:
                 for p2attack in p2AttackArray:
-                    counterHitConstraint(C_1,p1position,p1attack,p2position,p2attack)
+                    counterHitConstraint(C_1,p1attack,p2attack)
                     trade(Trade_1,p1position,p1attack,p2position,p2attack)
                     throwBreak(throwBreak_1,p1attack,p2attack)
     for p1action in p1ActionArray:
