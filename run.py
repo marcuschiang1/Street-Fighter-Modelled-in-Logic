@@ -216,20 +216,35 @@ if __name__ == "__main__":
     p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1,C_1,Trade_1,throwBreak_1]
     p1CombinedArray = p1AttackArray+p1ActionArray
     
-    for v,vn in zip(p1CombinedArray, 'pPkKTHSBbFNCtQ'):
-        print(" %s: %.2f" % (vn, likelihood(D, v)))
-    
-    print("\nLikelihood for player 2 to perform a certain action:")
-    p2AttackArray = [lightP_2,overheadP_2,standK_2,crouchK_2,T_2,H_2,SHORYU_2]
-    p2ActionArray = [HB_2,LB_2,FJUMP_2,NJUMP_2]
-    p2CombinedArray = p2AttackArray+p2ActionArray
-    
-    for v,vn in zip(p2CombinedArray, 'pPkKTHSBbFNt'):
+   # Adding the outputs to a table, so that no matter what order the outputs come in, they will match up with the correct header.
+    variable = [0]*4
+    head = ["Player1 Action",  "Player1 position","Player2 position", "Player2 Attack"]
+
+    for key,value in D.solve().items():
+        if value == True:
+            print(key)
+            if (key.type == "p1Attack"):
+                variable[0] = (key.data)
+            elif (key.type == "p1Action"):
+                variable[0] = (key.data)
+            elif (key.type == "p1Position"):
+                variable[1] = (key.position)
+            elif (key.type == "p2Attack"):
+                variable[3] = (key.data)
+            elif (key.type == "p2Action"):
+                variable[0] = (key.data)
+            elif (key.type == "p2Position"):
+                variable[2] = (key.position)
+   
+    for v,vn in zip(p1CombinedArray, 'pPkKTHSBbFN'):
         print(" %s: %.2f" % (vn, likelihood(D, v)))
     print(len(D.vars()))
+    print(D.size())
     print(len(D))
-  
-    
 
+    mydata = []
+    
+    mydata.append(variable)
+    print(tabulate(mydata, head, tablefmt="fancy_grid"))
     
     
