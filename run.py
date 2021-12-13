@@ -122,9 +122,11 @@ def rangeConstraint(action,p1position,p2position):
 def combination(arr,r):
     return list(itertools.combinations(arr,r))
 def trade(tradeVar,p1position,p1attack,p2position,p2attack):
-    if ((p1attack.startUp!=p2attack.startUp)):
-        E.add_constraint(~(Trade_1&(p1position&p1attack&p2position&p2attack)))
-
+    if ((p1attack.startUp!=p2attack.startUp) and (p1attack.blockType != "unblockable" and p2attack.blockType != "unblockable")):
+        E.add_constraint(~(tradeVar&(p1position&p1attack&p2position&p2attack)))
+def throwBreak(breakVar,p1attack,p2attack):
+    if ((p1attack.blockType != "unblockable" and p2attack.blockType != "unblockable")):
+        E.add_constraint(~(breakVar&(p1attack&p2attack)))
 #THEORIES
 p1AttackArray = [lightP_1,standK_1,overheadP_1,crouchK_1,T_1,H_1,SHORYU_1]
 p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
@@ -178,18 +180,17 @@ def defence():
                 for p2attack in p2AttackArray:
                     counterHitConstraint(C_1,p1position,p1attack,p2position,p2attack)
                     trade(Trade_1,p1position,p1attack,p2position,p2attack)
+                    throwBreak(throwBreak_1,p1attack,p2attack)
     for p1action in p1ActionArray:
         E.add_constraint(~(C_1&p1action))
     for p1action in p1ActionArray:
         E.add_constraint(~(Trade_1&p1action))
     #StartUp (this is to make sure that player1 will not perform an attack that is slower than player2 attack, range already accounted for above)
     #Have to bind each attack constraint to a range, or else the attacks will be completely negated for all positions
-    for p1position in p1PositionArray:
-        for p2position in p2PositionArray:
-            for p1attack in p1AttackArray:
-                for p2attack in p2AttackArray:
-                    if (p1attack.startUp>p2attack.startUp):
-                        E.add_constraint(~(p1attack&p2attack))
+    for p1attack in p1AttackArray:
+        for p2attack in p2AttackArray:
+            if (p1attack.startUp>p2attack.startUp):
+                E.add_constraint(~(p1attack&p2attack))
     #Rules:
     #High/Low blocking
     for attack in p2AttackArray:
@@ -212,10 +213,10 @@ if __name__ == "__main__":
     pprint.pprint(D.solve())
     print("\nLikelihood for player 1 to perform a certain action:")
     p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchK_1,T_1,H_1,SHORYU_1]
-    p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1,C_1,Trade_1]
+    p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1,C_1,Trade_1,throwBreak_1]
     p1CombinedArray = p1AttackArray+p1ActionArray
     
-    for v,vn in zip(p1CombinedArray, 'pPkKTHSBbFNCt'):
+    for v,vn in zip(p1CombinedArray, 'pPkKTHSBbFNCtQ'):
         print(" %s: %.2f" % (vn, likelihood(D, v)))
     
     print("\nLikelihood for player 2 to perform a certain action:")
@@ -223,7 +224,7 @@ if __name__ == "__main__":
     p2ActionArray = [HB_2,LB_2,FJUMP_2,NJUMP_2]
     p2CombinedArray = p2AttackArray+p2ActionArray
     
-    for v,vn in zip(p2CombinedArray, 'pPkKTHSBbFN'):
+    for v,vn in zip(p2CombinedArray, 'pPkKTHSBbFNt'):
         print(" %s: %.2f" % (vn, likelihood(D, v)))
     print(len(D.vars()))
     print(len(D))
