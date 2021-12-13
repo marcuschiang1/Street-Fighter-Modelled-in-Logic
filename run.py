@@ -186,7 +186,7 @@ def defence():
         for p2position in p2PositionArray:
             for p1attack in p1AttackArray:
                 for p2attack in p2AttackArray:
-                    if (p1attack.startUp>=p2attack.startUp):
+                    if (p1attack.startUp>p2attack.startUp):
                         E.add_constraint(~(p1attack&p2attack))
     #Rules:
     #High/Low blocking
