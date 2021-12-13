@@ -29,7 +29,14 @@ class p1Action:
         self.type = "p1Action"
     def __repr__(self):
         return f"p1.{self.data}"
-
+@proposition(E)
+class p1Counter:
+    def __init__(self, data):
+        self.data = data
+        self.type = "p1Counter"
+    def __repr__(self):
+        return f"p1.{self.data}"
+C_1 = p1Counter("COUNTER")
 
 lightP_1 = p1Attack("Light Punch",2,3,"mid") #Player 1 performs a punch (adjacent)
 overheadP_1 = p1Attack("Overhead punch",2,22,"overhead")
@@ -63,7 +70,14 @@ class p2Action:
         self.type = "p2Action"
     def __repr__(self):
         return f"p2.{self.data}"
-
+@proposition(E)
+class p2Counter:
+    def __init__(self, data):
+        self.data = data
+        self.type = "p2Counter"
+    def __repr__(self):
+        return f"p2.{self.data}"
+C_2 = p2Counter("COUNTER")
 #Propositions for player 2 
 lightP_2 = p2Attack("Light Punch",2,3,"mid" ) #Player 1 performs a punch (adjacent)
 overheadP_2 = p2Attack("Overhead punch",2,22,"overhead")
@@ -104,12 +118,7 @@ p2PositionArray = [p2Position(1),p2Position(2),p2Position(3),p2Position(4),p2Pos
 
 
 #Propositions pertaining to both players
-p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchKick_1,T_1,H_1,SHORYU_1]
-p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
-p2AttackArray = [lightP_2,overheadP_2,standK_2,crouchKick_2,T_2,H_2,SHORYU_2]
-p2ActionArray = [HB_2,LB_2,FJUMP_2,NJUMP_1]
-eitherJump1 = (FJUMP_1|NJUMP_1)
-eitherJump2 = (FJUMP_2|NJUMP_2)
+
 
 def rangeConstraint(action,p1position,p2position):
     if (abs(p1position.position-p2position.position)>action.range):
@@ -125,8 +134,17 @@ def counterHitCheck(p1position,p1attack,p2position,p2attack):
 
 
 #############################################
-
+p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchKick_1,T_1,H_1,SHORYU_1]
+p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
+p2AttackArray = [lightP_2,overheadP_2,standK_2,crouchKick_2,T_2,H_2,SHORYU_2]
+p2ActionArray = [HB_2,LB_2,FJUMP_2,NJUMP_1]
+eitherJump1 = (FJUMP_1|NJUMP_1)
+eitherJump2 = (FJUMP_2|NJUMP_2)
 def flawlessDefence():
+    for attack in p1AttackArray:
+        E.add_constraint(~attack)
+    E.add_constraint(~FJUMP_1)
+    E.add_constraint(~NJUMP_1)
     for p1position,p2position in zip(p1PositionArray,p2PositionArray):#Both players may not be in the same position
         E.add_constraint(~(p1position&p2position))
     E.add_constraint(~HB_2)
@@ -173,10 +191,13 @@ def flawlessDefence():
             E.add_constraint(~(attack&~(MB_1)))
         if (attack.blockType == "low"):
             E.add_constraint(~(attack&~(LB_1)))
+        if (attack.blockType == "unblockable"):
+            E.add_constraint(~attack&~(T_1|eitherJump1))
     return E
 
 if __name__ == "__main__":
     D = flawlessDefence()
+    
     
     # Don't compile until you're finished adding all your constraints!
     D = D.compile()
@@ -190,8 +211,8 @@ if __name__ == "__main__":
     p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchKick_1,T_1,H_1,SHORYU_1]
     p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
     p1CombinedArray = p1AttackArray+p1ActionArray
-    head = ["Player1 attack", "Player1 Action", "Player1 position","Player2 attack", "Player2 Action", "Player2 position"]
-    variable = []*6
+    head = ["Player1 attack",  "Player1 position","Player2 attack", "Player2 position"]
+    variable = []*4
   
     for key,value in D.solve().items():
         if value == True:
