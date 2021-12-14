@@ -3,14 +3,14 @@ import os, sys
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
 from bauhaus.core import print_theory
-from run import example_theory
+from run import defence
 
 USAGE = '\n\tpython3 test.py [draft|final]\n'
 EXPECTED_VAR_MIN = 10
 EXPECTED_CONS_MIN = 50
 
 def test_theory():
-    T = example_theory()
+    T = defence()
     T = T.compile()
 
     assert len(T.vars()) > EXPECTED_VAR_MIN, "Only %d variables -- your theory is likely not sophisticated enough for the course project." % len(T.vars())

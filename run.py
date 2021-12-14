@@ -146,13 +146,13 @@ def defence():
         E.add_constraint(~(subset[0]&subset[1]))
     for subset in combination(p2AttackArray,2):#Cannot perform any 2 attacks at once
         E.add_constraint(~(subset[0]&subset[1]))
-    for i in range(len(p2AttackArray)-1):#Cannot perform and attack and block at the same time
-        E.add_constraint(~(p2AttackArray[i]&MB_2))
-    for i in range(1,len(p2ActionArray)-1):#Cannot perform either jump and block at the same time
-        E.add_constraint(~(MB_2&p2AttackArray[i]))
-    for i in range(2,len(p2AttackArray)-1):#Cannot do either jump and certain attacks
-        E.add_constraint(~(NJUMP_2&p2AttackArray[i]))
-        E.add_constraint(~(FJUMP_2&p2AttackArray[i]))
+    for i in range(len(p2AttackArray)-1):#Cannot perform an attack and block at the same time
+        E.add_constraint(~(p2AttackArray[i]& MB_2))
+    #Cannot perform either jump and block
+    E.add_constraint(~(eitherJump2&MB_2))
+    #Cannot perform attacks and jump
+    for i in range(len(p2AttackArray)-1):
+        E.add_constraint(~(eitherJump2&p2AttackArray[i]))
     #P1 Range
     for p1position in p1PositionArray: #Uses the previously defined range function for all combinations for positions
         for p2position in p2PositionArray:
@@ -179,12 +179,12 @@ def defence():
             E.add_constraint(~(attack&LB_1))
         if (attack.blockType == "low"):
             E.add_constraint(~(attack&HB_1))#If the attack type is low, player 1 cannot block overhead
-    #Special cases
-    #Going to define special rules of street figher 
-    #Format will be, if player 2 does x, player 1 may not counter this with a or b or c ...
-    
-
+    #Fireballs
+    E.add_constraint(~(H_2&~(eitherJump1|H_1|MB_1))) #Jump over, fireball back, or block
+    #Shoryukens
+    E.add_constraint(~(SHORYU_2&~(MB_1|T_1))) #Block or throw shoryukens
     return E
+    
 
 if __name__ == "__main__":
     D = defence()
@@ -204,11 +204,9 @@ if __name__ == "__main__":
 
     for key,value in D.solve().items():
         if value == True:
-            print(key.type)
             if (key.type == "p1Attack"):
                 variable[0] = (key.data)
             elif (key.type == "p1Counter"):
-                print(key.data)
                 if key.data == "TRADE":
                     variable[4] = "False"
                     variable[5] = "True"
