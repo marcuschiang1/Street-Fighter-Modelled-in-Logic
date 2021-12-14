@@ -178,11 +178,6 @@ def defence():
             E.add_constraint(~(attack&LB_1))
         if (attack.blockType == "low"):
             E.add_constraint(~(attack&HB_1))#If the attack type is low, player 1 cannot block overhead
-    #Special cases
-    #Going to define special rules of street figher 
-    #Format will be, if player 2 does x, player 1 may not counter this with a or b or c ...
-    
-
     return E
 
 if __name__ == "__main__":
