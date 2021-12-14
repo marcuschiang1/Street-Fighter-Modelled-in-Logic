@@ -35,15 +35,15 @@ class p1Interaction:
         self.type = "p1Counter"
     def __repr__(self):
         return f"p1.{self.data}"
-C_1 = p1Interaction("COUNTER")
-Trade_1 = p1Interaction("TRADE")
+counter_1 = p1Interaction("COUNTER")
+trade_1 = p1Interaction("TRADE")
 throwBreak_1 = p1Interaction("THROW BREAK")
 lightP_1 = p1Attack("Light Punch",1,3,"mid") #Player 1 performs a punch (adjacent)
 overheadP_1 = p1Attack("Overhead punch",2,22,"overhead")
 crouchK_1 = p1Attack("Crouching Kick",3,6,"low")
 standK_1 = p1Attack("Kick",4,8,"mid") #Player 1 performs a kick (one space between)
 T_1 = p1Attack("Throw",1,5,"unblockable") #Player 1 performs a throw (adjacent)
-H_1 = p1Attack("Hadouken",7,14,"mid") #Player 1 has performed a H (2 spaces between)
+H_1 = p1Attack("Hadouken",8,14,"mid") #Player 1 has performed a H (2 spaces between)
 SHORYU_1 = p1Attack("Shoryuken",1,0,"mid") #Player 1 has performed a shoryuken (Beats MP)
 HB_1 = p1Action("HighBlock") #PLayer1 is blocking high
 LB_1 = p1Action("LowBlock") #Player1 is blocking Low
@@ -83,7 +83,7 @@ overheadP_2 = p2Attack("Overhead punch",2,22,"overhead")
 crouchK_2 = p2Attack("Crouching Kick",3,6,"low")
 standK_2 = p2Attack("Kick",4,8,"mid") #Player 1 performs a kick (one space between)
 T_2 = p2Attack("Throw",1,5,"unblockable") #Player 1 performs a throw (adjacent)
-H_2 = p2Attack("Hadouken",7,14,"mid") #Player 1 has performed a H (2 spaces between)
+H_2 = p2Attack("Hadouken",8,14,"mid") #Player 1 has performed a H (2 spaces between)
 SHORYU_2 = p2Attack("Shoryuken",1,0,"mid") #Player 1 has performed a shoryuken (Beats MP)
 HB_2 = p2Action("HighBlock") #Player 2 is blocking high
 LB_2 = p2Action("LowBlock") #Player 2 is blocking Low
@@ -113,20 +113,21 @@ class p2Position:
 p1PositionArray = [p1Position(1),p1Position(2),p1Position(3),p1Position(4),p1Position(5),p1Position(6),p1Position(7),p1Position(8),p1Position(9),p1Position(10)]
 p2PositionArray = [p2Position(1),p2Position(2),p2Position(3),p2Position(4),p2Position(5),p2Position(6),p2Position(7),p2Position(8),p2Position(9),p2Position(10)]
 #Functions
-def counterHitConstraint(p1counterhit,p1position,p1attack,p2position,p2attack):
-    if ((p1attack.startUp>=p2attack.startUp)):
-        E.add_constraint(~(p1counterhit&(p1position&p1attack&p2position&p2attack)))
+def counterHit(counterVar,p1attack,p2attack):
+    if (p1attack.startUp>p2attack.startUp):
+        E.add_constraint(~(counterVar&p1attack&p2attack))
+def trade(tradeVar,p1attack,p2attack):
+    if(p1attack.data != p2attack.data):
+        E.add_constraint(~(tradeVar&p1attack&p2attack))
+def throwBreak(breakVar,p1attack,p2attack):
+    if (p1attack.blockType != "unblockable" and p2attack.blockType != "unblockable"):
+        E.add_constraint(~(breakVar&p1attack&p2attack))
 def rangeConstraint(action,p1position,p2position):
     if (abs(p1position.position-p2position.position)>action.range):
         E.add_constraint(~(p1position&p2position&action))
 def combination(arr,r):
     return list(itertools.combinations(arr,r))
-def trade(tradeVar,p1attack,p2attack):
-    if ((p1attack.startUp!=p2attack.startUp)):
-        E.add_constraint(~(tradeVar&(p1attack&p2attack)))
-def throwBreak(breakVar,p1attack,p2attack):
-    if ((p1attack.blockType != "unblockable" and p2attack.blockType != "unblockable")):
-        E.add_constraint(~(breakVar&p1attack&p2attack))
+
 #THEORIES
 p1AttackArray = [lightP_1,standK_1,overheadP_1,crouchK_1,T_1,H_1,SHORYU_1]
 p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1]
@@ -136,7 +137,8 @@ eitherJump1 = (FJUMP_1|NJUMP_1)
 eitherJump2 = (FJUMP_2|NJUMP_2)
 
 def defence():
-    E.add_constraint(~MB_2)
+    E.add_constraint(~HB_2)
+    E.add_constraint(~LB_2)
     E.add_constraint(lightP_1|overheadP_1|standK_1|crouchK_1|T_1|H_1|SHORYU_1|HB_1|LB_1|FJUMP_1|NJUMP_1)#Player 1 has to do something, they cannot just sit there
     for p1position,p2position in zip(p1PositionArray,p2PositionArray):#Both players may not be in the same position
         E.add_constraint(~(p1position&p2position))
@@ -174,23 +176,17 @@ def defence():
             for attack in p2AttackArray:
                 rangeConstraint(attack,p2position,p1position)
     #Counterhit (this makes it so C_1 is not true if p1 does not perform a counter hit)
-    for p1position in p1PositionArray:
-        for p2position in p2PositionArray:
-            for p1attack in p1AttackArray:
-                for p2attack in p2AttackArray:
-                    counterHitConstraint(C_1,p1attack,p2attack)
-                    trade(Trade_1,p1position,p1attack,p2position,p2attack)
-                    throwBreak(throwBreak_1,p1attack,p2attack)
-    for p1action in p1ActionArray:
-        E.add_constraint(~(C_1&p1action))
-    for p1action in p1ActionArray:
-        E.add_constraint(~(Trade_1&p1action))
-    #StartUp (this is to make sure that player1 will not perform an attack that is slower than player2 attack, range already accounted for above)
-    #Have to bind each attack constraint to a range, or else the attacks will be completely negated for all positions
     for p1attack in p1AttackArray:
         for p2attack in p2AttackArray:
-            if (p1attack.startUp>p2attack.startUp):
-                E.add_constraint(~(p1attack&p2attack))
+            counterHit(counter_1,p1attack,p2attack)
+            trade(trade_1,p1attack,p2attack)
+            throwBreak(throwBreak_1,p1attack,p2attack)
+    for p1action in p1ActionArray:
+        E.add_constraint(~(counter_1&p1action))
+    for p1action in p1ActionArray:
+        E.add_constraint(~(trade_1&p1action))
+    for p1action in p1ActionArray:
+        E.add_constraint(~(throwBreak_1&p1action))
     #Rules:
     #High/Low blocking
     for attack in p2AttackArray:
@@ -198,7 +194,13 @@ def defence():
             E.add_constraint(~(attack&LB_1))
         if (attack.blockType == "low"):
             E.add_constraint(~(attack&HB_1))
-    
+    #Special cases
+    #Shoryuken
+    E.add_constraint(~(SHORYU_1&(T_2)))#Throw beats shoryuken
+    #Jumping
+    E.add_constraint(~(eitherJump1&SHORYU_2))#Will get anti-aired
+    #Throws
+    E.add_constraint(~(T_2&MB_1))#Can not block a throw
     return E
 
 if __name__ == "__main__":
@@ -213,7 +215,7 @@ if __name__ == "__main__":
     pprint.pprint(D.solve())
     print("\nLikelihood for player 1 to perform a certain action:")
     p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchK_1,T_1,H_1,SHORYU_1]
-    p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1,C_1,Trade_1,throwBreak_1]
+    p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1,counter_1,trade_1]
     p1CombinedArray = p1AttackArray+p1ActionArray
     
    # Adding the outputs to a table, so that no matter what order the outputs come in, they will match up with the correct header.
@@ -222,7 +224,6 @@ if __name__ == "__main__":
 
     for key,value in D.solve().items():
         if value == True:
-            print(key)
             if (key.type == "p1Attack"):
                 variable[0] = (key.data)
             elif (key.type == "p1Action"):
@@ -235,8 +236,10 @@ if __name__ == "__main__":
                 variable[0] = (key.data)
             elif (key.type == "p2Position"):
                 variable[2] = (key.position)
-   
-    for v,vn in zip(p1CombinedArray, 'pPkKTHSBbFN'):
+    wordArray = []
+    for element in p1CombinedArray:
+        wordArray.append(element.data)
+    for v,vn in zip(p1CombinedArray, wordArray):
         print(" %s: %.2f" % (vn, likelihood(D, v)))
     print(len(D.vars()))
     print(D.size())
