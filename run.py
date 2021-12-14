@@ -6,51 +6,48 @@ from tabulate import tabulate
 import pprint
 import itertools
 
-
 # For a complete module reference, see https://bauhaus.readthedocs.io/en/latest/bauhaus.html
 # Encoding that will store all of your constraints
 E = Encoding()
 #Player 1
 @proposition(E)
-class p1Attack:
+class p1Attack: #Propositions for creating player 1 attacks
     def __init__(self,data, range, startUp, blockType):
-        self.data = data
-        self.range = range
+        self.data = data #For representation
+        self.range = range #How many spaces the move can move, relative to the position variables made later
         self.startUp = startUp #Startup speed (lower is better cause less startup frames, 60fps game), a 3 frame move is 3/60 seconds   
         self.blockType = blockType #Overhead or low
-        self.type = "p1Attack"
+        self.type = "p1Attack" #Type for checking when printing table
     def __repr__(self):
         return f"p1.{self.data}"
 @proposition(E)
-class p1Action:
+class p1Action: #player 1 actions, specifically actions they can take THAT ARE NOT ATTACKS
     def __init__(self, data):
-        self.data = data
-        self.type = "p1Action"
+        self.data = data #For representation
+        self.type = "p1Action" #For sorting
     def __repr__(self):
         return f"p1.{self.data}"
 @proposition(E)
-class p1Interaction:
+class p1Interaction: #Indicates when a defensive move results in a counter hit or trade
     def __init__(self, data):
         self.data = data
         self.type = "p1Counter"
     def __repr__(self):
         return f"p1.{self.data}"
-counter_1 = p1Interaction("COUNTER")
-trade_1 = p1Interaction("TRADE")
-throwBreak_1 = p1Interaction("THROW BREAK")
+counter_1 = p1Interaction("COUNTER") #Is true when player 1 has landed a counter
+trade_1 = p1Interaction("TRADE") #Is true when player 1 trades with the opponent
 lightP_1 = p1Attack("Light Punch",1,3,"mid") #Player 1 performs a punch (adjacent)
-overheadP_1 = p1Attack("Overhead punch",2,22,"overhead")
-crouchK_1 = p1Attack("Crouching Kick",3,6,"low")
+overheadP_1 = p1Attack("Overhead punch",2,22,"overhead") #Player 1 performs an overhead attack with 2 range and 22 frames of startup
+crouchK_1 = p1Attack("Crouching Kick",3,6,"low") #
 standK_1 = p1Attack("Kick",4,8,"mid") #Player 1 performs a kick (one space between)
 T_1 = p1Attack("Throw",1,5,"unblockable") #Player 1 performs a throw (adjacent)
 H_1 = p1Attack("Hadouken",8,14,"mid") #Player 1 has performed a H (2 spaces between)
 SHORYU_1 = p1Attack("Shoryuken",1,0,"mid") #Player 1 has performed a shoryuken (Beats MP)
-HB_1 = p1Action("HighBlock") #PLayer1 is blocking high
+HB_1 = p1Action("HighBlock") #Player1 is blocking high
 LB_1 = p1Action("LowBlock") #Player1 is blocking Low
 NJUMP_1 = p1Action("Neutral Jump") #Player 1 jumps
 FJUMP_1 = p1Action("Forward Jump") #Player 1 jumps
-MB_1 = (LB_1|HB_1)
-
+MB_1 = (LB_1|HB_1) #Mid
 #Player 2
 @constraint.exactly_one(E)
 @proposition(E)
@@ -68,13 +65,6 @@ class p2Action:
     def __init__(self, data):
         self.data = data
         self.type = "p2Action"
-    def __repr__(self):
-        return f"p2.{self.data}"
-@proposition(E)
-class p2Counter:
-    def __init__(self, data):
-        self.data = data
-        self.type = "p2Counter"
     def __repr__(self):
         return f"p2.{self.data}"
 #Propositions for player 2 
@@ -180,13 +170,10 @@ def defence():
         for p2attack in p2AttackArray:
             counterHit(counter_1,p1attack,p2attack)
             trade(trade_1,p1attack,p2attack)
-            throwBreak(throwBreak_1,p1attack,p2attack)
     for p1action in p1ActionArray:
         E.add_constraint(~(counter_1&p1action))
     for p1action in p1ActionArray:
         E.add_constraint(~(trade_1&p1action))
-    for p1action in p1ActionArray:
-        E.add_constraint(~(throwBreak_1&p1action))
     #Rules:
     #High/Low blocking
     for attack in p2AttackArray:
@@ -196,7 +183,7 @@ def defence():
             E.add_constraint(~(attack&HB_1))
     #Special cases
     #Shoryuken
-    E.add_constraint(~(SHORYU_1&(T_2)))#Throw beats shoryuken
+    E.add_constraint(SHORYU_2&~())#Throw beats shoryuken
     #Jumping
     E.add_constraint(~(eitherJump1&SHORYU_2))#Will get anti-aired
     #Throws
@@ -205,10 +192,7 @@ def defence():
 
 if __name__ == "__main__":
     D = defence()
-    # Don't compile until you're finished adding all your constraints!
     D = D.compile()
-    # After compilation (and only after), you can check some of the properties
-    # of your model:
     pprint.pprint("\nSatisfiable: %s" % D.satisfiable())
     print("# Solutions: %d" % count_solutions(D))
     pprint.pprint("Solution:")
