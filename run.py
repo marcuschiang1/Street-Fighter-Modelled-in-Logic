@@ -31,6 +31,7 @@ class p1Action: #player 1 actions, specifically actions they can take THAT ARE N
 class p1Interaction: #Indicates when a defensive move results in a counter hit or trade
     def __init__(self, data):
         self.data = data
+        self.type = "p1Counter"
     def __repr__(self):
         return f"p1.{self.data}"
 counter_1 = p1Interaction("COUNTER") #Is true when player 1 has landed a counter
@@ -178,6 +179,11 @@ def defence():
             E.add_constraint(~(attack&LB_1))
         if (attack.blockType == "low"):
             E.add_constraint(~(attack&HB_1))#If the attack type is low, player 1 cannot block overhead
+    #Special cases
+    #Going to define special rules of street figher 
+    #Format will be, if player 2 does x, player 1 may not counter this with a or b or c ...
+    
+
     return E
 
 if __name__ == "__main__":
