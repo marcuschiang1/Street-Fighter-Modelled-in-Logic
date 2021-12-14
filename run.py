@@ -199,31 +199,40 @@ if __name__ == "__main__":
     p1CombinedArray = p1AttackArray+p1ActionArray
     
    # Adding the outputs to a table, so that no matter what order the outputs come in, they will match up with the correct header.
-    variable = [0]*4
-    head = ["Player1 Action",  "Player1 position","Player2 position", "Player2 Attack"]
+    variable = [0]*6
+    head = ["Player1 Action",  "Player1 position","Player2 position", "Player2 Attack","Counter","Trade"]
 
     for key,value in D.solve().items():
         if value == True:
+            print(key.type)
             if (key.type == "p1Attack"):
                 variable[0] = (key.data)
-            elif (key.type == "p1Action"):
-                variable[0] = (key.data)
+            elif (key.type == "p1Counter"):
+                print(key.data)
+                if key.data == "TRADE":
+                    variable[4] = "False"
+                    variable[5] = "True"
+                else:
+                    variable[4] = "True"
+                    variable[5] = "False"
             elif (key.type == "p1Position"):
                 variable[1] = (key.position)
             elif (key.type == "p2Attack"):
                 variable[3] = (key.data)
-            elif (key.type == "p2Action"):
-                variable[0] = (key.data)
+            elif (key.type == "p1Trade"):
+                if value == True:
+                    variable[5] = "True"
+                else:
+                    variable[5] = "False"
             elif (key.type == "p2Position"):
                 variable[2] = (key.position)
+       
     wordArray = []
     for element in p1CombinedArray:
         wordArray.append(element.data)
     for v,vn in zip(p1CombinedArray, wordArray):
         print(" %s: %.2f" % (vn, likelihood(D, v)))
-    print(len(D.vars()))
-    print(D.size())
-    print(len(D))
+
 
     mydata = []
     
