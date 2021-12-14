@@ -51,7 +51,7 @@ MB_1 = (LB_1|HB_1) #Mid
 #Player 2
 @constraint.exactly_one(E)
 @proposition(E)
-class p2Attack:
+class p2Attack: #Same as player 1 attack, they are the same character
     def __init__(self,data, range,startUp,blockType):
         self.data = data
         self.range = range
@@ -61,7 +61,7 @@ class p2Attack:
     def __repr__(self):
         return f"p2.{self.data}"
 @proposition(E)
-class p2Action:
+class p2Action: #Same as player 1
     def __init__(self, data):
         self.data = data
         self.type = "p2Action"
@@ -84,16 +84,16 @@ MB_2 = (LB_2|HB_2)
 #Player Positions
 @constraint.exactly_one(E)
 @proposition(E)
-class p1Position:
+class p1Position: #Create position variables for player 1
     def __init__(self, position):
-        self.position = position
-        self.type = "p1Position"
-        self.data = position
+        self.position = position #Position is an integer
+        self.type = "p1Position" #For sorting
+        self.data = position #For sorting
     def __repr__(self):
         return f"p1Position.{self.position}"
 @constraint.exactly_one(E)
 @proposition(E)
-class p2Position:
+class p2Position: #Same as player 1
     def __init__(self, position):
         self.position = position
         self.type = "p2Position"
@@ -102,20 +102,18 @@ class p2Position:
         return f"p2Position.{self.position}"
 p1PositionArray = [p1Position(1),p1Position(2),p1Position(3),p1Position(4),p1Position(5),p1Position(6),p1Position(7),p1Position(8),p1Position(9),p1Position(10)]
 p2PositionArray = [p2Position(1),p2Position(2),p2Position(3),p2Position(4),p2Position(5),p2Position(6),p2Position(7),p2Position(8),p2Position(9),p2Position(10)]
+#Arrays containing all the possible positions that player 1 or player 2 could occupy
 #Functions
-def counterHit(counterVar,p1attack,p2attack):
-    if (p1attack.startUp>p2attack.startUp):
+def counterHit(counterVar,p1attack,p2attack): #If the attack of player 1 is faster than player 2, it will be a counter hit
+    if (p1attack.startUp>p2attack.startUp): #Covering all situations in which a counter hit is not applicable (covering situations in which it is applicable creates problems)
         E.add_constraint(~(counterVar&p1attack&p2attack))
-def trade(tradeVar,p1attack,p2attack):
+def trade(tradeVar,p1attack,p2attack): #If both players use the same move on eachother, it will trade
     if(p1attack.data != p2attack.data):
         E.add_constraint(~(tradeVar&p1attack&p2attack))
-def throwBreak(breakVar,p1attack,p2attack):
-    if (p1attack.blockType != "unblockable" and p2attack.blockType != "unblockable"):
-        E.add_constraint(~(breakVar&p1attack&p2attack))
-def rangeConstraint(action,p1position,p2position):
+def rangeConstraint(action,p1position,p2position):#If the distance between two players is greater than the range of one of their moves, restrist that situation
     if (abs(p1position.position-p2position.position)>action.range):
         E.add_constraint(~(p1position&p2position&action))
-def combination(arr,r):
+def combination(arr,r):#Create combinations for constraints in theory
     return list(itertools.combinations(arr,r))
 
 #THEORIES
@@ -127,7 +125,7 @@ eitherJump1 = (FJUMP_1|NJUMP_1)
 eitherJump2 = (FJUMP_2|NJUMP_2)
 
 def defence():
-    E.add_constraint(~HB_2)
+    E.add_constraint(~HB_2) #Restrict player 2 from blocking, they are on offence
     E.add_constraint(~LB_2)
     E.add_constraint(lightP_1|overheadP_1|standK_1|crouchK_1|T_1|H_1|SHORYU_1|HB_1|LB_1|FJUMP_1|NJUMP_1)#Player 1 has to do something, they cannot just sit there
     for p1position,p2position in zip(p1PositionArray,p2PositionArray):#Both players may not be in the same position
@@ -156,21 +154,21 @@ def defence():
         E.add_constraint(~(NJUMP_2&p2AttackArray[i]))
         E.add_constraint(~(FJUMP_2&p2AttackArray[i]))
     #P1 Range
-    for p1position in p1PositionArray:
+    for p1position in p1PositionArray: #Uses the previously defined range function for all combinations for positions
         for p2position in p2PositionArray:
             for attack in p1AttackArray:
                 rangeConstraint(attack,p1position,p2position)
     #P2 Range
-    for p2position in p2PositionArray:
+    for p2position in p2PositionArray: #Same as p1 range, but for p2
         for p1position in p1PositionArray:
             for attack in p2AttackArray:
                 rangeConstraint(attack,p2position,p1position)
     #Counterhit (this makes it so C_1 is not true if p1 does not perform a counter hit)
     for p1attack in p1AttackArray:
         for p2attack in p2AttackArray:
-            counterHit(counter_1,p1attack,p2attack)
+            counterHit(counter_1,p1attack,p2attack) #Checks each attacks range and speed to see if counter hit or trade
             trade(trade_1,p1attack,p2attack)
-    for p1action in p1ActionArray:
+    for p1action in p1ActionArray: #Counterhit cannot occur when player 1 is not attacking
         E.add_constraint(~(counter_1&p1action))
     for p1action in p1ActionArray:
         E.add_constraint(~(trade_1&p1action))
