@@ -187,54 +187,52 @@ def defence():
     
 
 if __name__ == "__main__":
-    D = defence()
-    D = D.compile()
-    pprint.pprint("\nSatisfiable: %s" % D.satisfiable())
-    print("# Solutions: %d" % count_solutions(D))
-    pprint.pprint("Solution:")
-    pprint.pprint(D.solve())
-    print("\nLikelihood for player 1 to perform a certain action:")
-    p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchK_1,T_1,H_1,SHORYU_1]
-    p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1,counter_1,trade_1]
-    p1CombinedArray = p1AttackArray+p1ActionArray
-    
-   # Adding the outputs to a table, so that no matter what order the outputs come in, they will match up with the correct header.
-    variable = [0]*6
-    head = ["Player1 Action",  "Player1 position","Player2 position", "Player2 Attack","Counter","Trade"]
+    for i in range(10):
+        D = defence()
+        D = D.compile()
+        #pprint.pprint("\nSatisfiable: %s" % D.satisfiable())
+        #print("# Solutions: %d" % count_solutions(D))
+        #pprint.pprint("Solution:")
+        #pprint.pprint(D.solve())
+        #print("\nLikelihood for player 1 to perform a certain action:")
+        p1AttackArray = [lightP_1,overheadP_1,standK_1,crouchK_1,T_1,H_1,SHORYU_1]
+        p1ActionArray = [HB_1,LB_1,FJUMP_1,NJUMP_1,counter_1,trade_1]
+        p1CombinedArray = p1AttackArray+p1ActionArray
+        
+    # Adding the outputs to a table, so that no matter what order the outputs come in, they will match up with the correct header.
+        variable = [0]*6
+        head = ["Player1 Action",  "Player1 position","Player2 position", "Player2 Attack","Counter","Trade"]
 
-    for key,value in D.solve().items():
-        if value == True:
-            if (key.type == "p1Attack"):
-                variable[0] = (key.data)
-            elif (key.type == "p1Counter"):
-                if key.data == "TRADE":
-                    variable[4] = "False"
-                    variable[5] = "True"
-                else:
-                    variable[4] = "True"
-                    variable[5] = "False"
-            elif (key.type == "p1Position"):
-                variable[1] = (key.position)
-            elif (key.type == "p2Attack"):
-                variable[3] = (key.data)
-            elif (key.type == "p1Trade"):
-                if value == True:
-                    variable[5] = "True"
-                else:
-                    variable[5] = "False"
-            elif (key.type == "p2Position"):
-                variable[2] = (key.position)
-       
-    wordArray = []
-    for element in p1CombinedArray:
-        wordArray.append(element.data)
-    for v,vn in zip(p1CombinedArray, wordArray):
-        print(" %s: %.2f" % (vn, likelihood(D, v)))
-
-
-    mydata = []
-    
-    mydata.append(variable)
-    print(tabulate(mydata, head, tablefmt="fancy_grid"))
+        for key,value in D.solve().items():
+            if value == True:
+                if (key.type == "p1Attack"):
+                    variable[0] = (key.data)
+                elif (key.type == "p1Counter"):
+                    if key.data == "TRADE":
+                        variable[4] = "False"
+                        variable[5] = "True"
+                    else:
+                        variable[4] = "True"
+                        variable[5] = "False"
+                elif (key.type == "p1Position"):
+                    variable[1] = (key.position)
+                elif (key.type == "p2Attack"):
+                    variable[3] = (key.data)
+                elif (key.type == "p1Trade"):
+                    if value == True:
+                        variable[5] = "True"
+                    else:
+                        variable[5] = "False"
+                elif (key.type == "p2Position"):
+                    variable[2] = (key.position)
+        
+        wordArray = []
+        for element in p1CombinedArray:
+            wordArray.append(element.data)
+        #for v,vn in zip(p1CombinedArray, wordArray):
+            #print(" %s: %.2f" % (vn, likelihood(D, v)))
+        mydata = []
+        mydata.append(variable)
+        print(tabulate(mydata, head, tablefmt="fancy_grid"))
     
     
